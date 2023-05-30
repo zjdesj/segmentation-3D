@@ -78,13 +78,13 @@ class Farm():
     sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)
     sphere.translate(center)
     sphere.paint_uniform_color(np.asarray([1., 0., 0.]))
-    visualizer.add_geometry(sphere)
+    #visualizer.add_geometry(sphere)
 
     ro = visualizer.get_render_option()
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    #ro.background_color = np.asarray([0,0,0])
+    ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -204,21 +204,48 @@ class Farm():
       pcd = self.pcd
     print(' start cluster, method: DBSCAN: ')
 
-    eps = 0.5
-    min_points = 1000
-    labels = np.array(pcd.cluster_dbscan(eps, min_points, print_progress=True))
+    dbscan = {
+      'eps': 0.05,
+      'min_points': 10,
+      'min_cluster': 2000
+    }
+    self.dbscan = dbscan
+    labels = np.array(pcd.cluster_dbscan(dbscan['eps'], dbscan['min_points'], print_progress=True))
     max_label = labels.max()    # 获取聚类标签的最大值 [-1,0,1,2,...,max_label]，label = -1 为噪声，因此总聚类个数为 max_label + 1
     print(f"point cloud has {max_label + 1} clusters")
 
+    n = 0
+    for i in range(max_label + 1):
+      li = labels[labels == i]
+      if len(li) < dbscan['min_cluster']:
+        labels[labels == i] = -1
+      else:
+        labels[labels == i] = n
+        n += 1
+        
+    max_label = labels.max()
+    print(f"point cloud has {max_label + 1} clusters")
+
+    return labels
+  def showClusters(self, labels):
+    max_label = labels.max()
     colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
     colors[labels < 0] = 0  # labels = -1 的簇为噪声，以黑色显示
-    pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
-    self.visual(pcd)
+    self.pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
 
-
+    self.savePCD(f'31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}.pcd')
+    #self.visual(pcd)
+  def saveClusters(self, labels):
+    max_label = labels.max()
+    pcd = self.pcd
+    for i in range(max_label + 1):
+      ind = np.where(labels == i)[0]
+      cluster = pcd.select_by_index(ind)
+      name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
+      self.savePCD(name, cluster)
 
 if __name__ == '__main__':
-  #farm = Farm('31-7.pcd', rotate=True)
+  farm = Farm('31-7.pcd', rotate=True)
   #farm.show_Summary()
   #farm.visual()
   #farm.dense()
@@ -244,9 +271,14 @@ if __name__ == '__main__':
   #farm.savePCD('31-7_crop_raius.pcd')
 
 
-  farm = Farm('31-7_crop.pcd')
+  #farm = Farm('31-7_crop.pcd')
   #farm.visual()
-  farm.show_Summary()
-  farm.cluster()
+  #farm.show_Summary()
+  #labels = farm.cluster()
+  #farm.showClusters(labels)
+  #farm.saveClusters(labels)
 
+  farm = Farm('./31-7/31-7_crop_dbscan_5.0-10-2000-5.pcd')
+  farm.show_Summary()
+  farm.visual()
 
