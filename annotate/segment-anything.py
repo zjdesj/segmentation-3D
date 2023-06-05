@@ -6,13 +6,14 @@
 
 import cv2  # type: ignore
 
-from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
+from segment_anything import SamAutomaticMaskGenerator, sam_model_registry, SamPredictor
 
 import numpy as np
 import argparse
 import json
 import os
 from typing import Any, Dict, List
+from readXML import collectBoxes
 
 parser = argparse.ArgumentParser(
     description=(
@@ -29,6 +30,13 @@ parser.add_argument(
     help="Path to either a single input image or folder of images.",
 )
 parser.add_argument(
+    "--label",
+    type=str,
+    help=(
+        "Path to the directory where labels are put. "
+    ),
+)
+parser.add_argument(
     "--output",
     type=str,
     required=True,
@@ -37,6 +45,19 @@ parser.add_argument(
         "of PNGs per image or a single json with COCO-style masks."
     ),
 )
+
+def write_cattle_to_folder(masks, boxes, path: str, image) -> None:
+    for i, mask in enumerate(masks):
+        filename = f"{i}.png"
+        mask = mask[0][:, :, np.newaxis]
+        img = image * mask
+        [x, y, x1, y1] = boxes[i]
+
+        img = img[y: y1, x: x1, :]
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(os.path.join(path, filename), img)
+    return
+
 
 def write_masks_to_folder(masks: List[Dict[str, Any]], path: str, image) -> None:
     #bbox (list(float)): The box around the mask, in XYWH format
@@ -72,7 +93,6 @@ def write_masks_to_folder(masks: List[Dict[str, Any]], path: str, image) -> None
     return
 
 
-
 def main(args: argparse.Namespace) -> None:
     print("Loading model...")
 
@@ -83,12 +103,12 @@ def main(args: argparse.Namespace) -> None:
     _ = sam.to(device="cuda")
 
     output_mode = "binary_mask"
-    generator = SamAutomaticMaskGenerator(sam, output_mode=output_mode)
 
     output = args.output
     #output = '/content/image15'
     #input = '/content/DJI_20230109105426_0030_Zenmuse-L1-mission.JPG'
     input = args.input
+    label = args.label
 
     if not os.path.isdir(input):
         targets = [input]
@@ -100,6 +120,12 @@ def main(args: argparse.Namespace) -> None:
 
     os.makedirs(output, exist_ok=True)
 
+    if label:
+      main_prompt(targets, output, label, sam)
+      return
+
+    generator = SamAutomaticMaskGenerator(sam, output_mode=output_mode)
+
     for t in targets:
         print(f"Processing '{t}'...")
         image = cv2.imread(t)
@@ -110,18 +136,55 @@ def main(args: argparse.Namespace) -> None:
         # GPU 不足降低分辨率 或者考虑 分图片？
         image = cv2.resize(image, dsize=None, fx=0.5, fy=0.5)
 
+        base = os.path.basename(t)
+        base = os.path.splitext(base)[0]
+        save_base = os.path.join(output, base)
+
         masks = generator.generate(image)
+
+        os.makedirs(save_base, exist_ok=False)
+        
+        write_masks_to_folder(masks, save_base, image)
+    print("Done!")
+
+def main_prompt(targets, output, label, sam) -> None:
+    print("Prompt: Loading model...")
+
+    mask_predictor = SamPredictor(sam)
+
+    for t in targets:
+        print(f"Processing '{t}'...")
+        image = cv2.imread(t)
+
+        if image is None:
+            print(f"Could not load '{t}' as an image, skipping...")
+            continue
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # GPU 不足降低分辨率 或者考虑 分图片？
+        image = cv2.resize(image, dsize=None, fx=0.5, fy=0.5)
 
         base = os.path.basename(t)
         base = os.path.splitext(base)[0]
         save_base = os.path.join(output, base)
-        if output_mode == "binary_mask":
-            os.makedirs(save_base, exist_ok=False)
-            write_masks_to_folder(masks, save_base, image)
-        else:
-            save_file = save_base + ".json"
-            with open(save_file, "w") as f:
-                json.dump(masks, f)
+
+        boxes = collectBoxes(t, label)
+
+        mask_predictor = SamPredictor(sam)
+        mask_predictor.set_image(image)
+
+        input_boxes = torch.tensor(boxes, device=mask_predictor.device)  
+        transformed_boxes = mask_predictor.transform.apply_boxes_torch(input_boxes, image.shape[:2])
+
+        masks, iou_predictions, low_res_masks = mask_predictor.predict_torch(
+            point_coords=None,
+            point_labels=None,
+            boxes=transformed_boxes,
+            multimask_output=False
+        )
+
+        os.makedirs(save_base, exist_ok=False)
+        
+        write_cattle_to_folder(masks, boxes, save_base, image)
     print("Done!")
 
 
