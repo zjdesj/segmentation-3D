@@ -14,6 +14,7 @@ import json
 import os
 from typing import Any, Dict, List
 from readXML import collectBoxes
+import torch
 
 parser = argparse.ArgumentParser(
     description=(
@@ -49,7 +50,8 @@ parser.add_argument(
 def write_cattle_to_folder(masks, boxes, path: str, image) -> None:
     for i, mask in enumerate(masks):
         filename = f"{i}.png"
-        mask = mask[0][:, :, np.newaxis]
+        mask = np.array(mask[0].tolist())
+        mask = mask[:, :, np.newaxis]
         img = image * mask
         [x, y, x1, y1] = boxes[i]
 
@@ -160,8 +162,6 @@ def main_prompt(targets, output, label, sam) -> None:
             print(f"Could not load '{t}' as an image, skipping...")
             continue
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        # GPU 不足降低分辨率 或者考虑 分图片？
-        image = cv2.resize(image, dsize=None, fx=0.5, fy=0.5)
 
         base = os.path.basename(t)
         base = os.path.splitext(base)[0]
