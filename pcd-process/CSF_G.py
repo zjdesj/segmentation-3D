@@ -13,12 +13,15 @@ print(xyz.shape)
 csf = CSF.CSF()
 
 # prameter settings
-csf.params.bSloopSmooth = True
-csf.params.cloth_resolution = 0.005
+#the bSloopSmooth parameter corresponds to the "Slope postprocessing for disconnected terrain" option (checkbox) that appears in the CC plugin.
+csf.params.bSloopSmooth = False
+#Cloth resolution refers to the grid size (the unit is same as the unit of pointclouds) of cloth which is used to cover the terrain. The bigger cloth resolution you have set, the coarser DTM  you will get.
+csf.params.cloth_resolution = 0.01
 
-csf.params.time_step = 0.65
+# time step (dT), which controls the displacement of particles from gravity during each iteration;
+csf.params.time_step = 0.01
 #Classification threshold refers to a threshold (the unit is same as the unit of pointclouds) to classify the pointclouds into ground and non-ground parts based on the distances between points and the simulated terrain. 0.5 is adapted to most of scenes.
-csf.params.class_threshold = 0.001
+csf.params.class_threshold = 0.01
 csf.params.interations = 500
 
 csf.setPointCloud(xyz)
