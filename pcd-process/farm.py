@@ -252,14 +252,14 @@ if __name__ == '__main__':
   #farm.showHeightDense()
   #farm.showXYDense()
 
-  #cpcd = farm.removeRoofAndGround()
+  #cpcd = farm.removeRoofAndGround(min_threshold=-8)
   #farm.updatePCD(cpcd)
   #farm.show_Summary()
   #farm.visual()
   #farm.dense()
   #farm.showHeightDense()
   #farm.showXYDense()
-  #farm.savePCD('31-7_crop.pcd')
+  #farm.savePCD('31-7_crop_roof_.pcd')
 
   #rpcd = farm.removal()
   #farm.updatePCD(rpcd)
@@ -278,7 +278,11 @@ if __name__ == '__main__':
   #farm.showClusters(labels)
   #farm.saveClusters(labels)
 
-  farm = Farm('./31-7/31-7_crop_dbscan_5.0-10-2000-5.pcd')
+  #farm = Farm('./31-7/31-7_crop_dbscan_5.0-10-2000-5.pcd')
+  #farm.show_Summary()
+  #farm.visual()
+
+
+  farm = Farm('31-7_crop_roof_cattle.pcd')
   farm.show_Summary()
   farm.visual()
-

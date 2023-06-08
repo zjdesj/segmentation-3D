@@ -1,1 +1,7 @@
-open3d
+laspy==2.4.1
+matplotlib==3.7.0
+numpy==1.23.5
+open3d==0.16.1
+pptk==0.1.0
+segment_anything==1.0
+torch==1.12.1
