@@ -19,9 +19,9 @@ csf.params.bSloopSmooth = False
 csf.params.cloth_resolution = 0.01
 
 # time step (dT), which controls the displacement of particles from gravity during each iteration;
-csf.params.time_step = 0.01
+csf.params.time_step = 0.05
 #Classification threshold refers to a threshold (the unit is same as the unit of pointclouds) to classify the pointclouds into ground and non-ground parts based on the distances between points and the simulated terrain. 0.5 is adapted to most of scenes.
-csf.params.class_threshold = 0.01
+csf.params.class_threshold = 0.03
 # Max iterations refers to the maximum iteration times of terrain simulation. 500 is enough for most of scenes.
 csf.params.interations = 500
 
@@ -38,6 +38,8 @@ g = farm.pcd.select_by_index(np.array(ground))
 c = farm.pcd.select_by_index(np.array(non_ground))
 g_name = f'./31-7_crop_roof_ground_001_001.pcd'
 c_name = f'./31-7_crop_roof_cattle_001_001.pcd'
-farm.savePCD(g_name, g)
+print(np.array(ground).shape)
+
 farm.savePCD(c_name, c)
+farm.savePCD(g_name, g)
 
