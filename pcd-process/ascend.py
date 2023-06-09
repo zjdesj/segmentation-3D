@@ -62,11 +62,11 @@ for l in tqdm(X, desc='X in '):
 #    #print(f'{arr.shape}, mean: {np.mean(arr[:,2])}, variance: {np.var(arr[:,2])}')
     #grid.append([x0, x1, y0, y1, len, gap, mean, var])
     grid.append([x0, x1, y0, y1, len, gap])
+    #grid = np.concatenate((grid, [[x0, x1, y0, y1, len, gap]]))
 
     if gap < 0.1:
       inds = inds + tmp
-
-grid = np.array(grid)
+    print(inds)
 
 np.savetxt('./inds.txt', np.asarray(inds))
 np.savetxt('./grid.txt', grid)
