@@ -66,7 +66,6 @@ for l in tqdm(X, desc='X in '):
 
     if gap < 0.1:
       inds = inds + tmp
-    print(inds)
 
 np.savetxt('./inds.txt', np.asarray(inds))
 np.savetxt('./grid.txt', grid)
