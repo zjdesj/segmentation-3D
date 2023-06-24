@@ -4,31 +4,44 @@ from tqdm import tqdm
 
 import time
 
-farm = Farm('31-7_crop_roof.pcd')
-#farm.visual()
-farm.show_Summary()
+def seive(farm, step = 0.1):
+  [x_max, y_max, z_max] = farm.summary["max_bound"]
+  [x_min, y_min, z_min] = farm.summary["min_bound"]
 
-points = farm.getPoints()
+  print(f'x_min: {x_min}, x_max: {x_max}')
 
-X = np.arange(-56.3, 7.1, 0.1)
-#print(X.shape)
-Y = np.arange(0, 11, 0.1)
-#print(Y.shape)
+  points = farm.getPoints()[1:10]
 
-M = []
-N = []
+  #X = np.arange(np.floor(x_min / step), np.ceil(x_max / step), 1)
+  #Y = np.arange(np.floor(y_min / step), np.ceil(y_max / step), 1)
+  #print(X.shape)
+  #print(Y.shape)
 
-for point in tqdm(points):
-  [x, y, z] = point
-  m = np.floor((x - (-56.3)) / 0.1)
-  n = np.floor(y / 0.1)
+  M = []
+  N = []
 
-  M.append(m)
-  N.append(n)
+  for point in tqdm(points):
+    [x, y, z] = point
+    print(f'point: {point}')
+    m = np.floor((x - x_min) / step)
+    n = np.floor((y - y_min) / step)
+    print(m, n)
 
-arr = np.stack((M, N))
-arr = np.transpose(arr)
+    M.append(m)
+    N.append(n)
 
-points = np.hstack((points, arr))
+  print(M, N)
+  arr = np.stack((M, N)).astype(int)
+  print(arr)
+  arr = np.transpose(arr)
+  
+  print(arr.dtype)
+  dt = np.dtype(['float64, float64, float64, int32, int32]'])
+  points = np.hstack((points, arr)).astype(dt)
+  print(points)
 
-np.savetxt('./mesh_01_01.txt', points)
+
+if __name__ == '__main__':
+  farm = Farm('31-7_sample.pcd')
+  farm.show_summary()
+  seive(farm)

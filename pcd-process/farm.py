@@ -56,7 +56,7 @@ class Farm():
     self.summary = summary
     return summary
     
-  def show_Summary(self, pcd=None):
+  def show_summary(self, pcd=None):
     if not pcd:
       pcd = self.pcd 
     #self.get_summary(pcd)
@@ -84,7 +84,7 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    ro.background_color = np.asarray([0,0,0])
+    #ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -171,12 +171,16 @@ class Farm():
     max_bound[2] = max_threshold
     # ground
     min_bound[2] = min_threshold
+
+    ## sample slice 
+    #max_bound[0] = max_bound[0] - 25
+    #min_bound[0] = min_bound[0] + 25
     
     box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
 
     cpcd = self.pcd.crop(box)
 
-    #self.show_Summary(cpcd)
+    #self.show_summary(cpcd)
     return cpcd
     self.updatePCD(cpcd)
     #self.visual()
@@ -246,7 +250,7 @@ class Farm():
 
 if __name__ == '__main__':
   farm = Farm('31-7.pcd', rotate=True)
-  #farm.show_Summary()
+  #farm.show_summary()
   #farm.visual()
   #farm.dense()
   #farm.showHeightDense()
@@ -254,16 +258,16 @@ if __name__ == '__main__':
 
   #cpcd = farm.removeRoofAndGround(min_threshold=-8)
   #farm.updatePCD(cpcd)
-  #farm.show_Summary()
+  #farm.show_summary()
   #farm.visual()
   #farm.dense()
   #farm.showHeightDense()
   #farm.showXYDense()
-  #farm.savePCD('31-7_crop_roof_.pcd')
+  #farm.savePCD('31-7_sample.pcd')
 
   #rpcd = farm.removal()
   #farm.updatePCD(rpcd)
-  #farm.show_Summary()
+  #farm.show_summary()
   #farm.visual()
   #farm.dense()
   #farm.showHeightDense()
@@ -273,16 +277,16 @@ if __name__ == '__main__':
 
   #farm = Farm('31-7_crop.pcd')
   #farm.visual()
-  #farm.show_Summary()
+  #farm.show_summary()
   #labels = farm.cluster()
   #farm.showClusters(labels)
   #farm.saveClusters(labels)
 
   #farm = Farm('./31-7/31-7_crop_dbscan_5.0-10-2000-5.pcd')
-  #farm.show_Summary()
+  #farm.show_summary()
   #farm.visual()
 
 
-  farm = Farm('31-7_crop_roof_cattle.pcd')
-  farm.show_Summary()
+  farm = Farm('./31-7/31-7_crop_dbscan.pcd')
+  farm.show_summary()
   farm.visual()

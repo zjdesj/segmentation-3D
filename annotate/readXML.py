@@ -6,6 +6,8 @@ def collectBoxes(name, label):
   print(f'name: {name}, label: {label}')
   file = Path(name)
   labelXML = Path(label, file.stem + '.xml')
+  if not labelXML.is_file():
+    return np.array([])
   print(f'label path: {str(labelXML)}')
 
   doc = minidom.parse(str(labelXML))

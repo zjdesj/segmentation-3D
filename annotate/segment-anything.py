@@ -168,6 +168,8 @@ def main_prompt(targets, output, label, sam) -> None:
         save_base = os.path.join(output, base)
 
         boxes = collectBoxes(t, label)
+        if not len(boxes):
+          continue
 
         mask_predictor = SamPredictor(sam)
         mask_predictor.set_image(image)
