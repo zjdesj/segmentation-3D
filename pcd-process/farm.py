@@ -3,28 +3,48 @@ import numpy as np
 from pathlib import Path
 from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm, SymLogNorm
+import shutil
 
-def pretty(d): 
+def pretty(d, save_path=False): 
+  if save_path:
+    with open(save_path, 'w') as fw:
+      fw.write('{\n')
+      for e in d:
+        fw.write(f'  {e}: {d[e]}\n')
+      fw.write('}\n')
+      fw.close()
+
   print('{')
   for e in d:
     print(f'  {e}: {d[e]}')
   print('}\n')
 
+def add_dataPath(data_path):
 # 相对于项目根目录的数据目录
-__Data__ = '../data/pcd'
-def add_dataPath():
+    __Data__ = data_path
     file_path = Path(__file__)
     project_root = file_path.parent.parent
     data_path = Path(project_root, __Data__)
     return data_path
 
+def set_dir_path(path, name):
+  file = Path(path, name)
+  dir = Path(path, file.stem) 
+  dir.mkdir(exist_ok=True)
+  if file.is_file():
+    shutil.move(file, dir)
+  return dir
+
 class Farm():
   
-  def __init__(self, pcd_name, rotate=False):
+  def __init__(self, pcd_name, rotate=False, data_path = add_dataPath('../data/pcd'), mkdir=True):
     # load point cloud data path
     self.name = Path(pcd_name).stem
-    data_path = add_dataPath() 
-    pcd_path = Path(data_path, pcd_name).resolve()
+    self.dir = data_path
+    if mkdir:
+      self.dir = set_dir_path(data_path, pcd_name)
+    
+    pcd_path = Path(self.dir, pcd_name)
     pcd_path_str = str(pcd_path)
     print(f"Load a ply point cloud: {pcd_path_str}")
     pcd = o3d.io.read_point_cloud(pcd_path_str)
@@ -56,13 +76,16 @@ class Farm():
     self.summary = summary
     return summary
     
-  def show_summary(self, pcd=None):
+  def show_summary(self, pcd=None, save=False):
     if not pcd:
       pcd = self.pcd 
     #self.get_summary(pcd)
     print('\n')
     print(f"summary of point cloud {self.name}: ")
-    pretty(self.summary)
+    if save:
+      pretty(self.summary, save_path=Path(self.dir,f'{self.name}_summary_{save}.txt'))
+    else:
+      pretty(self.summary)
   
   def visual(self, pcd=None):
     if not pcd:
@@ -84,7 +107,7 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    #ro.background_color = np.asarray([0,0,0])
+    ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -95,7 +118,7 @@ class Farm():
     visualizer.run()
     #visualizer.destroy_window()
 
-  def dense(self, pcd=None):
+  def dense(self, pcd=None, save=False, show=True):
     if not pcd:
       pcd = self.pcd 
     points = self.getPoints(pcd) 
@@ -122,9 +145,12 @@ class Farm():
     xy.set_title('x-y plane')
     
     fig.suptitle('points distribution')
-    plt.show()
+    if save:
+      self.saveFig(plt, 'dense', save)
+    if show:
+      plt.show()
 
-  def showHeightDense(self, pcd=None):
+  def showHeightDense(self, pcd=None, save=False, show=True):
     if not pcd:
       pcd = self.pcd 
     points = self.getPoints(pcd) 
@@ -136,9 +162,12 @@ class Farm():
     ax.annotate(" cattle should be under this height",xy=(-6.5,100),xytext=(-6.8,500),
       arrowprops=dict(facecolor="red",shrink=0.05,headwidth=12,headlength=6,width=4),
       fontsize=12)
-    plt.show()
+    if save:
+      self.saveFig(plt, 'heightDense', save)
+    if show:
+      plt.show()
     
-  def showXYDense(self, pcd=None, hexbin=False, all=False):
+  def showXYDense(self, pcd=None, hexbin=False, all=False, save=True, show=True):
     if not pcd:
       pcd = self.pcd 
     points = self.getPoints(pcd) 
@@ -152,7 +181,16 @@ class Farm():
 
     fig.colorbar(ret[3], ax=ahex, orientation='horizontal')
 
-    plt.show() 
+    if save:
+      self.saveFig(plt, 'xyDense', save)
+
+    if show:
+      plt.show() 
+
+  def saveFig(self, plt, type, tag): 
+    path = Path(self.dir, f'{self.name}_{type}_{tag}.png')
+    pathStr = str(path.resolve())
+    plt.savefig(pathStr, dpi=300, transparent=True)
 
   def updatePCD(self, pcd):
     self.pcd = pcd
@@ -164,6 +202,19 @@ class Farm():
     return points 
 
   #--------- below methods introduce filters to copy with point cloud.
+  def cropFarm(self):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+    
+    max_bound[0] = min_bound[0] + 63
+    min_bound[0] = min_bound[0] + 3.5 
+
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+    return cpcd
+  
+    
   def removeRoofAndGround(self, max_threshold=-6.5, min_threshold=-7.85):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]
@@ -184,23 +235,62 @@ class Farm():
     return cpcd
     self.updatePCD(cpcd)
     #self.visual()
-  def savePCD(self, name, pcd=None):
+
+  def cropFarm_y(self, max_y, min_y):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+    
+    max_bound[1] = max_y
+    min_bound[1] = min_y
+
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+    return cpcd
+
+  def cropCattle(self, pcd):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+
+    min_bound[0:2] = pcd.summary["min_bound"][0:2]
+    max_bound[0:2] = pcd.summary["max_bound"][0:2]
+    max_bound[2] = pcd.summary["min_bound"][2] + 1.7
+
+    print(f'min_bound: {min_bound}, max_bound: {max_bound}')
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+
+    return cpcd
+
+  def savePCD(self, tag, pcd=None, info=True, newDir=False):
     if not pcd:
       pcd = self.pcd 
+    #else:
+    #  self.updatePCD(pcd)
+    if newDir:
+      name = self.name
+      data_path = self.dir
+      self.dir = set_dir_path(data_path, name)
 
-    data_path = add_dataPath() 
-    pcd_path = Path(data_path, name).resolve()
+    pcd_path = Path(self.dir, f'{self.name}_{tag}.pcd')
     pcd_path_str = str(pcd_path)
+
     print(f"save a point cloud: {pcd_path_str}")
 
     o3d.io.write_point_cloud(pcd_path_str, pcd)
+
+    if info:
+      self.dense(save=tag, show=False)
+      self.showHeightDense(save=tag, show=False)
+      self.showXYDense(save=tag, show=False)
   
   def removal(self, pcd=None):
     if not pcd:
       pcd = self.pcd
     #rpcd, list = self.pcd.remove_radius_outlier(15, 0.05, True)
-    #rpcd, list = self.pcd.remove_radius_outlier(30, 0.05, True)
-    rpcd, list = self.pcd.remove_radius_outlier(100, 0.1, True)
+    rpcd, list = self.pcd.remove_radius_outlier(30, 0.05, True)
+    #rpcd, list = self.pcd.remove_radius_outlier(100, 0.1, True)
     return rpcd
 
   def cluster(self, pcd=None):
@@ -218,35 +308,56 @@ class Farm():
     max_label = labels.max()    # 获取聚类标签的最大值 [-1,0,1,2,...,max_label]，label = -1 为噪声，因此总聚类个数为 max_label + 1
     print(f"point cloud has {max_label + 1} clusters")
 
+    labels = self.filterLabels(labels, dbscan['min_cluster'])
+
+    # save labels
+    npyPath = Path(self.dir, f'{self.name}_{dbscan["eps"]}_{dbscan["min_points"]}.npy')
+    print(f'str(npyPath): {str(npyPath)}')
+    np.save(str(npyPath), labels)
+    return labels
+  
+  def filterLabels(self, labels, min_cluster):
+    max_label = labels.max() 
     n = 0
     for i in range(max_label + 1):
       li = labels[labels == i]
-      if len(li) < dbscan['min_cluster']:
+      if len(li) < min_cluster:
         labels[labels == i] = -1
-      else:
+      else: 
         labels[labels == i] = n
         n += 1
-        
-    max_label = labels.max()
-    print(f"point cloud has {max_label + 1} clusters")
 
     return labels
-  def showClusters(self, labels):
+    
+  def showClusters(self, labels, save=False):
     max_label = labels.max()
+    print('...labels', len(labels))
+    print(f'max_label: {max_label}')
+    print(labels/max_label)
     colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
     colors[labels < 0] = 0  # labels = -1 的簇为噪声，以黑色显示
     self.pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])
 
-    self.savePCD(f'31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}.pcd')
-    #self.visual(pcd)
+    if save:
+      self.savePCD('color')
+    self.visual()
+
   def saveClusters(self, labels):
     max_label = labels.max()
     pcd = self.pcd
     for i in range(max_label + 1):
       ind = np.where(labels == i)[0]
       cluster = pcd.select_by_index(ind)
-      name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
-      self.savePCD(name, cluster)
+
+      summary = self.set_summary(cluster)
+      if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
+        #print(summary)
+        #print(f'number {i}: area {summary["area"]}, height {summary["max_bound"][2]},')
+        #print('\n')
+        self.savePCD(f'cluster_{i}', pcd=cluster, info=False)
+      #name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
+      #self.savePCD(name, cluster)
+  
 
 if __name__ == '__main__':
   farm = Farm('31-7.pcd', rotate=True)
