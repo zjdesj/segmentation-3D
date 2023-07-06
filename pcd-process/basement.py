@@ -13,11 +13,11 @@ def pretty(d, save_path=False):
         fw.write(f'  {e}: {d[e]}\n')
       fw.write('}\n')
       fw.close()
-
-  print('{')
-  for e in d:
-    print(f'  {e}: {d[e]}')
-  print('}\n')
+  else:
+    print('{')
+    for e in d:
+      print(f'  {e}: {d[e]}')
+    print('}\n')
 
 def add_dataPath(data_path):
 # 相对于项目根目录的数据目录
@@ -28,8 +28,8 @@ def add_dataPath(data_path):
     return data_path
 
 def set_dir_path(path, name):
-  file = Path(path, name)
-  dir = Path(path, file.stem) 
+  file = Path(path, name + '.pcd')
+  dir = Path(path, name) 
   dir.mkdir(exist_ok=True)
   if file.is_file():
     shutil.move(file, dir)
@@ -42,7 +42,9 @@ class Farm():
     self.name = Path(pcd_name).stem
     self.dir = data_path
     if mkdir:
-      self.dir = set_dir_path(data_path, pcd_name)
+      self.newSaveDir()
+    #if mkdir:
+    #  self.dir = set_dir_path(data_path, pcd_name)
     
     pcd_path = Path(self.dir, pcd_name)
     pcd_path_str = str(pcd_path)
@@ -76,15 +78,15 @@ class Farm():
     self.summary = summary
     return summary
     
-  def show_summary(self, pcd=None, save=False):
+  def show_summary(self, pcd=None, save=False, show=True):
     if not pcd:
       pcd = self.pcd 
     #self.get_summary(pcd)
-    print('\n')
-    print(f"summary of point cloud {self.name}: ")
     if save:
-      pretty(self.summary, save_path=Path(self.dir,f'{self.name}_summary_{save}.txt'))
-    else:
+      pretty(self.summary, save_path=Path(self.dir,f'{self.name}_summary.txt'))
+    if show:
+      print('\n')
+      print(f"summary of point cloud {self.name}: ")
       pretty(self.summary)
   
   def visual(self, pcd=None):
@@ -146,7 +148,7 @@ class Farm():
     
     fig.suptitle('points distribution')
     if save:
-      self.saveFig(plt, 'dense', save)
+      self.saveFig(plt, 'dense')
     if show:
       plt.show()
 
@@ -163,7 +165,7 @@ class Farm():
       arrowprops=dict(facecolor="red",shrink=0.05,headwidth=12,headlength=6,width=4),
       fontsize=12)
     if save:
-      self.saveFig(plt, 'heightDense', save)
+      self.saveFig(plt, 'heightDense')
     if show:
       plt.show()
     
@@ -182,13 +184,13 @@ class Farm():
     fig.colorbar(ret[3], ax=ahex, orientation='horizontal')
 
     if save:
-      self.saveFig(plt, 'xyDense', save)
+      self.saveFig(plt, 'xyDense')
 
     if show:
       plt.show() 
 
-  def saveFig(self, plt, type, tag): 
-    path = Path(self.dir, f'{self.name}_{type}_{tag}.png')
+  def saveFig(self, plt, type): 
+    path = Path(self.dir, f'{self.name}_{type}.png')
     pathStr = str(path.resolve())
     plt.savefig(pathStr, dpi=300, transparent=True)
 
@@ -213,7 +215,6 @@ class Farm():
 
     cpcd = self.pcd.crop(box)
     return cpcd
-  
     
   def removeRoofAndGround(self, max_threshold=-6.5, min_threshold=-7.85):
     min_bound = self.summary["min_bound"]
@@ -231,10 +232,7 @@ class Farm():
 
     cpcd = self.pcd.crop(box)
 
-    #self.show_summary(cpcd)
     return cpcd
-    self.updatePCD(cpcd)
-    #self.visual()
 
   def cropFarm_y(self, max_y, min_y):
     min_bound = self.summary["min_bound"]
@@ -262,29 +260,40 @@ class Farm():
     cpcd = self.pcd.crop(box)
 
     return cpcd
+  
 
-  def savePCD(self, tag, pcd=None, info=True, newDir=False):
+  def newSaveDir(self):
+    name = self.name
+    data_path = self.dir
+    self.dir = set_dir_path(data_path, name)
+
+  def savePCD(self, tag, pcd=None):
     if not pcd:
       pcd = self.pcd 
+      self.name = f'{self.name}_{tag}'
     #else:
     #  self.updatePCD(pcd)
-    if newDir:
-      name = self.name
-      data_path = self.dir
-      self.dir = set_dir_path(data_path, name)
 
-    pcd_path = Path(self.dir, f'{self.name}_{tag}.pcd')
+    pcd_path = Path(self.dir, f'{self.name}.pcd')
     pcd_path_str = str(pcd_path)
 
     print(f"save a point cloud: {pcd_path_str}")
 
     o3d.io.write_point_cloud(pcd_path_str, pcd)
-
-    if info:
-      self.dense(save=tag, show=False)
-      self.showHeightDense(save=tag, show=False)
-      self.showXYDense(save=tag, show=False)
   
+  def saveCattlePCD(self, tag, cattle):
+    name = f'{self.name}_{tag}'
+    pcd_path = Path(self.dir, f'{name}.pcd')
+    pcd_path_str = str(pcd_path)
+    print(f"save a point cloud for cattle: {pcd_path_str}")
+    o3d.io.write_point_cloud(pcd_path_str, cattle)
+
+  def savePCDInfo(self):
+    self.show_summary(save=True, show=False)
+    self.dense(save=True, show=False)
+    self.showHeightDense(save=True, show=False)
+    self.showXYDense(save=True, show=False)
+
   def removal(self, pcd=None):
     if not pcd:
       pcd = self.pcd
@@ -342,19 +351,22 @@ class Farm():
       self.savePCD('color')
     self.visual()
 
-  def saveClusters(self, labels):
+  def saveClusters(self, labels, foot_height=-11.54, standing_height=-10.8):
     max_label = labels.max()
     pcd = self.pcd
+    self.dir = set_dir_path(self.dir, 'clusters')
     for i in range(max_label + 1):
       ind = np.where(labels == i)[0]
       cluster = pcd.select_by_index(ind)
 
       summary = self.set_summary(cluster)
-      if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
+      if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] <= foot_height):
+
+      #if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
         #print(summary)
         #print(f'number {i}: area {summary["area"]}, height {summary["max_bound"][2]},')
         #print('\n')
-        self.savePCD(f'cluster_{i}', pcd=cluster, info=False)
+        self.saveCattlePCD(f'cluster_{i}', pcd=cluster)
       #name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
       #self.savePCD(name, cluster)
   
