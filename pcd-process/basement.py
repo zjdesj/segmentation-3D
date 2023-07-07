@@ -109,7 +109,7 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    ro.background_color = np.asarray([0,0,0])
+    ro.background_color = np.asarray([0.6,0.6,0.6])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -364,7 +364,7 @@ class Farm():
     Path(self.dir, 'standing').mkdir(exist_ok=True)
     Path(self.dir, 'no-standing').mkdir(exist_ok=True)
     Path(self.dir, 'uncertain').mkdir(exist_ok=True)
-    
+
     for i in range(max_label + 1):
       ind = np.where(labels == i)[0]
       cluster = pcd.select_by_index(ind)

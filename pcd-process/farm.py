@@ -70,9 +70,9 @@ def getNumbers(pcd_path, ground_height):
 
 def dbscan(pcd_path, min_height, eps, points, cluster_points):
   dir = Path(pcd_path).parent
-  farm = Farm(Path(pcd_path).name, rotate=False, data_path=dir)
+  farm = Farm(Path(pcd_path).name, rotate=False, data_path=dir, mkdir=False)
   labels = farm.cluster(min_points=points, min_cluster=cluster_points, eps=eps)
-  farm.saveClusters(labels, standing_height=(min_height + 0.3), foot_height=min_height)
+  farm.saveClusters(labels, standing_height=(min_height + 0.25), foot_height=min_height)
 
 
   
