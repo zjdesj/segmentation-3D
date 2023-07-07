@@ -161,9 +161,9 @@ class Farm():
     fig, ax = plt.subplots()
     ax.set_title('points distribution on height/ 1cm')
     ax.hist(z, bins=332)
-    ax.annotate(" cattle should be under this height",xy=(-6.5,100),xytext=(-6.8,500),
-      arrowprops=dict(facecolor="red",shrink=0.05,headwidth=12,headlength=6,width=4),
-      fontsize=12)
+    #ax.annotate(" cattle should be under this height",xy=(-6.5,100),xytext=(-6.8,500),
+    #  arrowprops=dict(facecolor="red",shrink=0.05,headwidth=12,headlength=6,width=4),
+    #  fontsize=12)
     if save:
       self.saveFig(plt, 'heightDense')
     if show:
@@ -204,12 +204,12 @@ class Farm():
     return points 
 
   #--------- below methods introduce filters to copy with point cloud.
-  def cropFarm(self):
+  def cropFarm(self, shift=3.5):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]
     
-    max_bound[0] = min_bound[0] + 63
-    min_bound[0] = min_bound[0] + 3.5 
+    max_bound[0] = min_bound[0] + 59.5 + shift
+    min_bound[0] = min_bound[0] + shift 
 
     box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
 
@@ -302,31 +302,34 @@ class Farm():
     #rpcd, list = self.pcd.remove_radius_outlier(100, 0.1, True)
     return rpcd
 
-  def cluster(self, pcd=None):
+  def cluster(self, pcd=None, eps=0.05, min_points=10, min_cluster=2000):
     if not pcd:
       pcd = self.pcd
     print(' start cluster, method: DBSCAN: ')
 
     dbscan = {
-      'eps': 0.05,
-      'min_points': 10,
-      'min_cluster': 2000
+      'eps': eps,
+      #'min_points': 10,
+      #'min_cluster': 2000
+      'min_points': min_points,
+      'min_cluster': min_cluster
     }
     self.dbscan = dbscan
     labels = np.array(pcd.cluster_dbscan(dbscan['eps'], dbscan['min_points'], print_progress=True))
+    labels = self.filterLabels(labels, dbscan['min_cluster'])
     max_label = labels.max()    # 获取聚类标签的最大值 [-1,0,1,2,...,max_label]，label = -1 为噪声，因此总聚类个数为 max_label + 1
     print(f"point cloud has {max_label + 1} clusters")
 
-    labels = self.filterLabels(labels, dbscan['min_cluster'])
 
     # save labels
-    npyPath = Path(self.dir, f'{self.name}_{dbscan["eps"]}_{dbscan["min_points"]}.npy')
+    npyPath = Path(self.dir, f'{self.name}_{dbscan["eps"]}_{dbscan["min_points"]}_{dbscan["min_cluster"]}.npy')
     print(f'str(npyPath): {str(npyPath)}')
     np.save(str(npyPath), labels)
     return labels
   
   def filterLabels(self, labels, min_cluster):
     max_label = labels.max() 
+    print(f'min_cluster: {min_cluster}')
     n = 0
     for i in range(max_label + 1):
       li = labels[labels == i]
@@ -355,18 +358,27 @@ class Farm():
     max_label = labels.max()
     pcd = self.pcd
     self.dir = set_dir_path(self.dir, 'clusters')
+
+
+    # create standingDir 
+    Path(self.dir, 'standing').mkdir(exist_ok=True)
+    Path(self.dir, 'no-standing').mkdir(exist_ok=True)
+    Path(self.dir, 'uncertain').mkdir(exist_ok=True)
+    
     for i in range(max_label + 1):
       ind = np.where(labels == i)[0]
       cluster = pcd.select_by_index(ind)
 
       summary = self.set_summary(cluster)
-      if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] <= foot_height):
+      #if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] <= foot_height):
+      if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] - foot_height >= 0):
+        self.saveCattlePCD(f'cluster_{i}', cluster)
 
-      #if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
-        #print(summary)
-        #print(f'number {i}: area {summary["area"]}, height {summary["max_bound"][2]},')
-        #print('\n')
-        self.saveCattlePCD(f'cluster_{i}', pcd=cluster)
+      ##if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
+      #  #print(summary)
+      #  #print(f'number {i}: area {summary["area"]}, height {summary["max_bound"][2]},')
+      #  #print('\n')
+      #  self.saveCattlePCD(f'cluster_{i}', cluster)
       #name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
       #self.savePCD(name, cluster)
   

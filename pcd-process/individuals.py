@@ -13,8 +13,9 @@ def process(cattle_path, farm_path):
   cattle_dir_name = cattle_dir.parent.stem + '_cluster'
   print(f'cattle_dir_name: {cattle_dir_name}')
 
-  # create standingDir 
-  Path(cattle_dir, 'standing').mkdir(exist_ok=True)
+  ## create standingDir 
+  #Path(cattle_dir, 'standing').mkdir(exist_ok=True)
+  #Path(cattle_dir, 'no-standing').mkdir(exist_ok=True)
 
   farm_dir = Path(farm_path) 
   farm = Farm(f'{farm_dir.stem}.pcd', rotate=True, data_path=farm_path, mkdir=False)
@@ -36,6 +37,8 @@ def process(cattle_path, farm_path):
       #elif is_extra == 'Y':
       #  pass
       continue
+    elif can_crop == 'M':
+      shutil.move(file, Path(cattle_dir, 'no-standing', file.name))
     elif can_crop == 'Y':
       pcd = farm.cropCattle(cattle) 
       cattle.updatePCD(pcd)
@@ -53,9 +56,4 @@ def process(cattle_path, farm_path):
         target_file_path = Path(cattle_dir, './standing/', cattle.name + '_segment.pcd')
         print(target_file_path)
         shutil.move(Path(cattle_dir, cattle.name + '_segment.pcd'), target_file_path)
-
-        #shutil.move(cattle.name + '_segment.pcd', './standing/' + cattle.name + '_segment.pcd')
-        #shutil.move(cattle.name, './standing/' + cattle.name)
-   
   return 
-
