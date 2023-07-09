@@ -372,16 +372,11 @@ class Farm():
       summary = self.set_summary(cluster)
       #if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] <= foot_height):
       if (summary["max_bound"][2] > standing_height) and (summary["min_bound"][2] - foot_height >= 0):
+        # remove wall.
+        if summary["region"][0] < 0.2:
+          continue
         self.saveCattlePCD(f'cluster_{i}', cluster)
 
-      ##if (summary["max_bound"][2] > -10.8) and (summary["min_bound"][2] <= -11.54):
-      #  #print(summary)
-      #  #print(f'number {i}: area {summary["area"]}, height {summary["max_bound"][2]},')
-      #  #print('\n')
-      #  self.saveCattlePCD(f'cluster_{i}', cluster)
-      #name = f'./31-7/31-7_crop_dbscan_{self.dbscan["eps"]*100}-{self.dbscan["min_points"]}-{self.dbscan["min_cluster"]}-{i}.pcd'
-      #self.savePCD(name, cluster)
-  
 
 if __name__ == '__main__':
   farm = Farm('31-7.pcd', rotate=True)
