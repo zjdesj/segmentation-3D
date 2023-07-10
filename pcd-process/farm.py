@@ -3,7 +3,7 @@ from basement import Farm
 from pathlib import Path
 
 
-def segmentation(pcd_path, pcd_name, shift=3.5, min_points=10, min_clusters=2000):
+def segmentation(pcd_path, pcd_name, shift=3.5, shift_y=0, min_points=10, min_clusters=2000):
   farm = Farm(pcd_name, rotate=True, data_path=pcd_path)
   # 分析原始数据
   farm.show_summary()
@@ -12,10 +12,15 @@ def segmentation(pcd_path, pcd_name, shift=3.5, min_points=10, min_clusters=2000
 
   # 截取x
   cpcd = farm.cropFarm(shift=shift)
+
+  if shift_y > 0:
+    farm.updatePCD(cpcd)
+    cpcd = farm.cropFarm_y_2(shift_y)
+
   farm.updatePCD(cpcd)
   farm.show_summary()
   farm.visual()
-  save = input('Save cropped farm along x axis:')
+  save = input('Save cropped farm along x(and y) axis:')
   if save == 'Y':
     farm.savePCD('cropx')
     farm.newSaveDir()

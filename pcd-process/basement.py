@@ -234,6 +234,18 @@ class Farm():
 
     return cpcd
 
+  def cropFarm_y_2(self, shift_y):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+    
+    max_bound[1] = min_bound[1] + 9.5 + shift_y
+    min_bound[1] = min_bound[1] + shift_y 
+
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+    return cpcd
+
   def cropFarm_y(self, max_y, min_y):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]
