@@ -89,7 +89,7 @@ class Farm():
       print(f"summary of point cloud {self.name}: ")
       pretty(self.summary)
   
-  def visual(self, pcd=None):
+  def visual(self, pcd=None, show_normal=False):
     if not pcd:
       pcd = self.pcd 
     
@@ -109,9 +109,13 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    ro.background_color = np.asarray([0.6,0.6,0.6])
+    #ro.background_color = np.asarray([0.6,0.6,0.6])
+    #ro.background_color = np.asarray([1,1,1])
+    ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
+
+    ro.point_show_normal = show_normal
 
     # must after added geometry, then it is possible to set full screen.
     visualizer.set_full_screen(True)
@@ -157,10 +161,13 @@ class Farm():
       pcd = self.pcd 
     points = self.getPoints(pcd) 
     z = points[:,2]
-    #z = z - self.summary["min_bound"][2]
+
+    z = z - self.summary["min_bound"][2]
+
     fig, ax = plt.subplots()
     ax.set_title('points distribution on height/ 1cm')
-    ax.hist(z, bins=332)
+    #ax.hist(z, bins=332)
+    ax.hist(z, bins=270)
     #ax.annotate(" cattle should be under this height",xy=(-6.5,100),xytext=(-6.8,500),
     #  arrowprops=dict(facecolor="red",shrink=0.05,headwidth=12,headlength=6,width=4),
     #  fontsize=12)
@@ -233,7 +240,16 @@ class Farm():
     cpcd = self.pcd.crop(box)
 
     return cpcd
+  
+  def crop_z(self, gap):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
 
+    min = min_bound[2] + gap
+    max = min_bound[2] + 1.35
+
+    return self.removeRoofAndGround(max_threshold=max, min_threshold=min)
+    
   def cropFarm_y_2(self, shift_y):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]
