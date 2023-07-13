@@ -207,7 +207,7 @@ class Farm():
   def getPoints(self, pcd=None):
     if not pcd:
       pcd = self.pcd 
-    points = np.asarray(self.pcd.points)
+    points = np.asarray(pcd.points)
     return points 
 
   #--------- below methods introduce filters to copy with point cloud.
