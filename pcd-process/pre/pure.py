@@ -7,36 +7,11 @@ from individuals import process
 from pathlib import Path
 
 stem = '9-62'
-root_path = '/Volumes/2T-Experiment/许昌牛场PCD/'
+#root_path = '/Volumes/2T-Experiment/许昌牛场PCD/'
+root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle'
 farm_path = Path(root_path, 'ret_pcd', stem)
 
 cattle_path = Path(root_path, 'cattle', stem)
-
-def entity(cattle_path, farm_path):
-  cattle = cattle_path.glob('*_cropx_cropz_cluster*.pcd')
-
-  farm = Farm(f'{stem}.pcd', rotate=True, data_path=farm_path, mkdir=False)
-
-  print(farm_path, '\n', cattle_path)
-
-  for file in sorted(cattle):
-    print(file.name, '\n')
-
-    calf = Farm(file.name, data_path=cattle_path, mkdir=False)
-    calf.show_summary()
-    calf.visual()
-
-    body = farm.cropCattle(calf) 
-    calf.updatePCD(body)
-    calf.show_summary()
-    calf.visual()
-      
-    calf.saveCattlePCD('segment', calf.pcd)
-    calf.newSaveDir()
-    calf.savePCDInfo()
-  return 
-
-#entity(cattle_path, farm_path)
 
 
 def purify(cattle_path, name):
@@ -65,6 +40,7 @@ def purify_1(cattle_path, name):
 
   # 截取去除地面的部分
   cattle = Farm(name, rotate=False, data_path=cattle_path, mkdir=False)
+  cattle.visual()
   cpcd = cattle.crop_z(0.2)
   cattle.updatePCD(cpcd)
 

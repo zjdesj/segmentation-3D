@@ -12,53 +12,6 @@ farm_path = Path(root_path, 'ret_pcd', stem)
 
 cattle_path = Path(root_path, 'cattle', stem)
 
-def entity(cattle_path, farm_path):
-  cattle = cattle_path.glob('*_cropx_cropz_cluster*.pcd')
-
-  farm = Farm(f'{stem}.pcd', rotate=True, data_path=farm_path, mkdir=False)
-
-  print(farm_path, '\n', cattle_path)
-
-  for file in sorted(cattle):
-    print(file.name, '\n')
-
-    calf = Farm(file.name, data_path=cattle_path, mkdir=False)
-    calf.show_summary()
-    calf.visual()
-
-    body = farm.cropCattle(calf) 
-    calf.updatePCD(body)
-    calf.show_summary()
-    calf.visual()
-      
-    calf.saveCattlePCD('segment', calf.pcd)
-    calf.newSaveDir()
-    calf.savePCDInfo()
-  return 
-
-#entity(cattle_path, farm_path)
-
-
-def purify(cattle_path, name):
-  cattle = Farm(name, rotate=False, data_path=cattle_path, mkdir=False)
-  cpcd = cattle.crop_z(0.07)
-  cattle.updatePCD(cpcd)
-
-  cattle.show_summary()
-  #cattle.showHeightDense()
-  #cattle.dense()
-
-  # 法线估计
-  radius = 0.01   # 搜索半径
-  max_nn = 30     # 邻域内用于估算法线的最大点数
-
-  cattle.pcd.estimate_normals()     # 执行法线估计
-
-  #cattle.visual(show_normal=True)
-
-  normals = np.asarray(cattle.pcd.normals)
-  print(normals, len(normals))
-
 def crop_x(cattle, min, step=0.01):
   min_bound = cattle.summary["min_bound"]
   max_bound = cattle.summary["max_bound"]

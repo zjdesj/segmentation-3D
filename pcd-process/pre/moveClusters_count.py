@@ -11,7 +11,7 @@ def getZip(root):
   f = open(Path(source, 'summary.csv'), 'w')
   writer = csv.writer(f)
 
-  for plan in  tqdm(source.iterdir(), desc='Moving cattle'):
+  for plan in tqdm(source.iterdir(), desc='Moving cattle'):
     if not plan.is_dir():
       continue
     stem = Path(plan).stem
