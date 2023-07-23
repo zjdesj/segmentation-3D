@@ -7,7 +7,8 @@ from individuals import process
 from pathlib import Path
 
 stem = '9-62'
-root_path = '/Volumes/2T-Experiment/许昌牛场PCD/'
+#root_path = '/Volumes/2T-Experiment/许昌牛场PCD/'
+root_path = '/Users/wyw/Documents/Chaper2/github-code/data'
 farm_path = Path(root_path, 'ret_pcd', stem)
 
 cattle_path = Path(root_path, 'cattle', stem)
@@ -74,7 +75,7 @@ def purify_1(cattle_path, name):
   print(tops.shape[0], tops[:3])
   cc = np.tile([0,1,0], (tops.shape[0], 1))
   print(cc.shape, cc[0:3])
-  tops[:,1] = 0
+  #tops[:,1] = 0
 
   tpcd = o3d.geometry.PointCloud()
   #tp = np.concatenate((points, tops), axis=0)

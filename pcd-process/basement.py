@@ -109,9 +109,9 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    #ro.background_color = np.asarray([0.6,0.6,0.6])
+    ro.background_color = np.asarray([0.6,0.6,0.6])
     #ro.background_color = np.asarray([1,1,1])
-    ro.background_color = np.asarray([0,0,0])
+    #ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -120,7 +120,8 @@ class Farm():
     # must after added geometry, then it is possible to set full screen.
     visualizer.set_full_screen(True)
     view_ctl = visualizer.get_view_control()
-    view_ctl.set_zoom(0.2)
+    view_ctl.set_zoom(1)
+    #view_ctl.set_zoom(0.2)
     visualizer.run()
     #visualizer.destroy_window()
 
@@ -241,6 +242,18 @@ class Farm():
 
     return cpcd
   
+  def crop_x(self, min, max):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+
+    min_bound[0] = min
+    max_bound[0] = max 
+
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+    return cpcd
+
   def crop_z(self, gap):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]
@@ -404,6 +417,19 @@ class Farm():
         if summary["region"][0] < 0.2:
           continue
         self.saveCattlePCD(f'cluster_{i}', cluster)
+  def saveClusters_2(self, labels):
+    max_label = labels.max()
+    pcd = self.pcd
+    self.dir = set_dir_path(self.dir, f'uncertain_clusters')
+
+    for i in range(max_label + 1):
+      ind = np.where(labels == i)[0]
+      cluster = pcd.select_by_index(ind)
+
+      summary = self.set_summary(cluster)
+      if summary["region"][0] < 0.2:
+        continue
+      self.saveCattlePCD(f'cattle_{i}', cluster)
 
 
 if __name__ == '__main__':

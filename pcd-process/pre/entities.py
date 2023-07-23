@@ -51,6 +51,17 @@ def getEntities(root_path):
 
   return
 
+def getUncertain(root_path, stem):
+  # stem = '9-62'
+  farm_path = Path(root_path, 'ret_pcd')
+  cattle_path = Path('/Users/wyw/Documents/Chaper2/github-code/data/cattle/', stem, 'uncertain/uncertain_clusters')
+
+  farm = Path(farm_path, stem)
+  entity(cattle_path, farm, stem)
+
+
 if __name__ == '__main__':
   root = '/Volumes/2T-Experiment/许昌牛场PCD/'
-  getEntities(root)
+  #getEntities(root)
+
+  getUncertain(root, '9-70')
