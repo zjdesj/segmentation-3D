@@ -189,6 +189,8 @@ class Farm():
     ret = ahex.hist2d(points[:, 0], points[:, 1], [1240, 440], norm=LogNorm())
     ahex.set_aspect(1)
 
+    #ahex.tick_params(labelsize=6)
+
     fig.colorbar(ret[3], ax=ahex, orientation='horizontal')
 
     if save:
