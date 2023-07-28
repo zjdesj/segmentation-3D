@@ -3,7 +3,6 @@ import sys
 import numpy as np
 sys.path.append('..')
 from farm import Farm
-from individuals import process
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
 
