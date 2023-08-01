@@ -5,6 +5,7 @@ sys.path.append('..')
 from farm import Farm
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
+import math
 
 
 def crop_x(cattle, min, step=0.01):
@@ -22,12 +23,11 @@ def crop_x(cattle, min, step=0.01):
   return cpcd
 
 # slice by slice
-def top_points(cattle_path, name):
+def top_points(cattle):
   # 截取去除地面的部分
-  cattle = Farm(name, rotate=False, data_path=cattle_path, mkdir=False)
-  cpcd = cattle.crop_z(0.2)
-  cattle.updatePCD(cpcd)
-  cattle.show_summary()
+  #cpcd = cattle.crop_z(0.2)
+  #cattle.updatePCD(cpcd)
+  #cattle.show_summary()
 
   x = np.arange(cattle.summary['min_bound'][0], cattle.summary['max_bound'][0], 0.01)
 
@@ -73,8 +73,8 @@ def top_points(cattle_path, name):
 
   return [tops, tops1, tops2]
 
-def backbones(cattle_path, name):
-  [tops, tops1, tops2] = top_points(cattle_path, name)
+def backbones(cattle):
+  [tops, tops1, tops2] = top_points(cattle)
   print(len(tops), len(tops1), len(tops2))
 
   cc = np.tile([0,1,0], (tops.shape[0], 1))
@@ -97,8 +97,8 @@ def backbones(cattle_path, name):
 
   return tpcd
 
-def backbone(cattle_path, name):
-  [tops, a, b] = top_points(cattle_path, name)
+def backbone(cattle):
+  [tops, a, b] = top_points(cattle)
   print(len(tops))
 
   cc = np.tile([0,1,0], (tops.shape[0], 1))
@@ -114,15 +114,14 @@ def backbone(cattle_path, name):
 
   return tpcd
 
-def backbone_xy(cattle_path, name):
+def backbone_xy(cattle, cattle_path, name):
   stem = Path(name).stem
-  [tops, a, b] = top_points(cattle_path, name)
+  [tops, a, b] = top_points(cattle)
   print(len(tops))
 
   cc = np.tile([0,1,0], (tops.shape[0], 1))
 
   tops[:,2] = 0
-
 
   savePath = Path(cattle_path, f'{stem}.npy')
   np.save(savePath, tops[:, [0,1]])
@@ -142,30 +141,40 @@ def getAngleFromFile(cattle_path, stem):
   angle = np.emath.arctanh(coef)
   print(f'coef: {coef}; angle: {angle}')
 
-def getAngle(data):
+def getAngle(data, direction):
   print(data.shape, data[:3, :])
+
+  if int(direction) == 0 or int(direction) == 3:
+    cursor = int(data.shape[0] * 0.6)
+    data = data[:cursor, :]
+  else:
+    cursor = int(data.shape[0] * 0.4)
+    data = data[cursor:, :]
+
+  print(data.shape)
 
   x = data[:, 0].reshape(-1, 1)
   y = data[:, 1].T
   model = LinearRegression().fit(x, y)
   coef = model.coef_
-  angle = np.emath.arctanh(coef)
+  angle = math.atan(coef)
   print(f'coef: {coef}; angle: {angle}')
   return angle
 
-stem = '9-62'
-root_path = '/Users/wyw/Documents/Chaper2/github-code/data'
-name = '9-62_cropx_cropz_cluster_2_segment.pcd'
-
-cattle_path = Path(root_path, 'cattle', stem)
-
-calf = Farm(name, rotate=False, data_path=cattle_path, mkdir=False)
-
-tpcd = backbone(cattle_path, name)
-data = backbone_xy(cattle_path, name)
-
-calf.updatePCD(tpcd)
-calf.show_summary()
-calf.visual()
-
-getAngle(data)
+#root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/total'
+#name = '8-1_9-58_8_0.pcd'
+#
+#cattle_path = Path(root_path, name)
+#
+#calf = Farm(name, rotate=False, data_path=cattle_path, mkdir=False)
+#calf.show_summary()
+#calf.visual()
+#
+#tpcd = backbone(cattle_path, name)
+#data = backbone_xy(cattle_path, name)
+#
+#calf.updatePCD(tpcd)
+#calf.show_summary()
+#calf.visual()
+#
+#getAngle(data)

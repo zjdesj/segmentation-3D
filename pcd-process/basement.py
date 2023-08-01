@@ -109,13 +109,13 @@ class Farm():
     # must after added geometry, then it is possible to set the point_size.
     ro.point_size = 1
     # set the background color of the open3d window to total black.
-    ro.background_color = np.asarray([0.6,0.6,0.6])
-    #ro.background_color = np.asarray([1,1,1])
+    #ro.background_color = np.asarray([0.6,0.6,0.6])
+    ro.background_color = np.asarray([1,1,1])
     #ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
-    ro.point_show_normal = show_normal
+    #ro.point_show_normal = show_normal
 
     # must after added geometry, then it is possible to set full screen.
     visualizer.set_full_screen(True)

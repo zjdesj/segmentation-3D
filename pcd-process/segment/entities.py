@@ -64,4 +64,4 @@ if __name__ == '__main__':
   root = '/Volumes/2T-Experiment/许昌牛场PCD/'
   #getEntities(root)
 
-  getUncertain(root, '9-70')
+  getUncertain(root, '9-62')
