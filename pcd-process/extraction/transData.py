@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-headings = '../../data-result/data-derection.xlsx'
+headings = '../../data-result/data-direction.xlsx'
 df = pd.read_excel(headings, sheet_name='data-derection', header=None)
 
 def trans():

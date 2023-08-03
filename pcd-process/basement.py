@@ -310,14 +310,18 @@ class Farm():
     data_path = self.dir
     self.dir = set_dir_path(data_path, name)
 
-  def savePCD(self, tag, pcd=None):
+  def savePCD(self, tag, pcd=None, targetDir=None):
     if not pcd:
       pcd = self.pcd 
       self.name = f'{self.name}_{tag}'
     #else:
     #  self.updatePCD(pcd)
 
-    pcd_path = Path(self.dir, f'{self.name}.pcd')
+    if targetDir:
+      pcd_path = Path(targetDir, f'{self.name}.pcd')
+    else:
+      pcd_path = Path(self.dir, f'{self.name}.pcd')
+
     pcd_path_str = str(pcd_path)
 
     print(f"save a point cloud: {pcd_path_str}")

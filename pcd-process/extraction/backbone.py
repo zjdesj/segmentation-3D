@@ -6,6 +6,7 @@ from farm import Farm
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
 import math
+import matplotlib.pyplot as plt
 
 
 def crop_x(cattle, min, step=0.01):
@@ -27,9 +28,9 @@ def top_points(cattle):
   # 截取去除地面的部分
   #cpcd = cattle.crop_z(0.2)
   #cattle.updatePCD(cpcd)
-  #cattle.show_summary()
+  cattle.show_summary()
 
-  x = np.arange(cattle.summary['min_bound'][0], cattle.summary['max_bound'][0], 0.01)
+  x = np.arange(cattle.summary['min_bound'][0], cattle.summary['max_bound'][0], 0.03)
 
   points = cattle.getPoints() 
 
@@ -41,7 +42,11 @@ def top_points(cattle):
   tops2 = None
   for cur in x:
     slice = crop_x(cattle, cur)
+    cattle.updatePCD(slice)
+    cattle.visual()
     sp = cattle.getPoints(slice)
+    
+    print(f'sp.leng: {len(sp)}')
     z = sp[:, 2] 
     
     ind = np.where(z == np.max(z))
@@ -141,8 +146,8 @@ def getAngleFromFile(cattle_path, stem):
   angle = np.emath.arctanh(coef)
   print(f'coef: {coef}; angle: {angle}')
 
-def getAngle(data, direction):
-  print(data.shape, data[:3, :])
+def getAngle(data, direction, show=False):
+  #print(data.shape, data[:3, :])
 
   if int(direction) == 0 or int(direction) == 3:
     cursor = int(data.shape[0] * 0.6)
@@ -159,6 +164,10 @@ def getAngle(data, direction):
   coef = model.coef_
   angle = math.atan(coef)
   print(f'coef: {coef}; angle: {angle}')
+
+  if show:
+    plt.scatter(x, y)
+    plt.show()
   return angle
 
 #root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/total'

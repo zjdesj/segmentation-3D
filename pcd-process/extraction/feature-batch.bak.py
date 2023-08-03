@@ -6,9 +6,13 @@ import numpy as np
 from tqdm import tqdm
 
 standing_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/'
-rotation = Path(standing_path, 'rotation')
 
-def forCategory(cate):
+
+def main():
+  rotation = Path(standing_path, 'rotation')
+  
+  #for cate in  tqdm(['0', '1', '2', '3'], desc='Rotating cattle'):
+  cate = '1'
   target = Path(rotation, cate)
   target.mkdir(exist_ok=True)
   data = getCategory(cate)
@@ -18,10 +22,14 @@ def forCategory(cate):
     name = stem + '_above.pcd'
     forOne(name, cate)
 
-def forAll():
-  for cate in tqdm(['0', '1', '2', '3', '4', '5', '6', '7'], desc='Cattle categories'):
-    forCategory(cate)
-  
+def forOne2R(cattle, dire):
+  arc1 = getaArc(cattle)
+  cattle = rotate(cattle, dire, arc1)
+
+  arc2 = getBodyArc(cattle, dire)
+
+  return arc1 + arc2
+
 
 def forOne(name, direction):
   cattle = getPCD(name)
@@ -35,28 +43,25 @@ def forOne(name, direction):
   else:
     dire = direction
 
-  if direction in ['4', '5', '6', '7']:
+  if direction in ['4', '5', '6']:
     cattle = rotateSpe(cattle, dire)
   else:
-    arc1 = getaArc(cattle)
-    cattle = rotate(cattle, dire, arc1)
+    arc = forOne2R(cattle, dire)
 
-    #cattle.visual()
-    arc2 = getBodyArc(cattle, dire)
-    #cattle = rotate(cattle, direction, arc1 + arc2)
-    #cattle.visual()
+    cattleR = getPCD(name)
+    if direction in ['1', '2']:
+      cattleR = rotateReverse(cattle)
 
-    cattle = getPCD(name)
-    cattle = rotate(cattle, dire, arc1 + arc2)
+    cattleN = rotate(cattleR, dire, arc)
 
-  if direction in ['1', '2']:
-    cattle = rotateReverse(cattle)
-
-  target = Path(standing_path, 'rotation', direction)
-  cattle.savePCD('ro', targetDir=target)
+    target = Path(standing_path, 'rotation', direction)
+    cattleN.savePCD('ro', targetDir=target)
 
 if __name__ == '__main__':
   name = '15-3_9-49_18_above.pcd'
   #forOne(name, '5')
-  #forCategory('1')
-  forAll()
+  main()
+
+
+
+
