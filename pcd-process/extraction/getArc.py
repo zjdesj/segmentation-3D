@@ -1,3 +1,4 @@
+# a component for standardization.
 import sys
 sys.path.append('..')
 from basement import Farm
@@ -8,6 +9,12 @@ import matplotlib.pyplot as plt
 
 def getPCD(name):
   root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/above'
+  calf = Farm(name, rotate=False, data_path=root_path, mkdir=False)
+  return calf
+
+def getEPCD(name):
+  name = name.replace('_above', '')
+  root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/entity'
   calf = Farm(name, rotate=False, data_path=root_path, mkdir=False)
   return calf
 

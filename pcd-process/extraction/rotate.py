@@ -1,3 +1,4 @@
+# a component for standardization.
 import numpy as np
 
 def rotate(cattle, direction, arc):
@@ -6,10 +7,10 @@ def rotate(cattle, direction, arc):
     R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, -abs(arc)))
   elif direction == '3':
     R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, abs(arc)))
-  elif direction == '1':
-    R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, np.pi + abs(arc)))
-  elif direction == '2':
-    R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, np.pi - abs(arc)))
+  #elif direction == '1':
+  #  R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, np.pi + abs(arc)))
+  #elif direction == '2':
+  #  R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, np.pi - abs(arc)))
 
  
   #R1 = cattle.pcd.get_rotation_matrix_from_xyz((0, 0, 0.75 * np.pi ))
