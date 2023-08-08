@@ -30,9 +30,8 @@ def top_points(cattle):
   #cattle.updatePCD(cpcd)
   cattle.show_summary()
 
-  x = np.arange(cattle.summary['min_bound'][0], cattle.summary['max_bound'][0], 0.01)
+  x = np.arange(cattle.summary['min_bound'][0], cattle.summary['max_bound'][0], 0.03)
 
-  print(f'x.length: {len(x)}')
   points = cattle.getPoints() 
 
   # 取最大
@@ -43,6 +42,8 @@ def top_points(cattle):
   tops2 = None
   for cur in x:
     slice = crop_x(cattle, cur)
+    cattle.updatePCD(slice)
+    cattle.visual()
     sp = cattle.getPoints(slice)
     
     print(f'sp.leng: {len(sp)}')
@@ -131,6 +132,43 @@ def backbone_xy(cattle, cattle_path, name):
   np.save(savePath, tops[:, [0,1]])
 
   return tops[:, [0,1]]
+  
+
+def getAngleFromFile(cattle_path, stem):
+  savePath = Path(cattle_path, f'{stem}.npy')
+  data = np.load(savePath)
+  print(data.shape, data[:3, :])
+
+  x = data[:, 0].reshape(-1, 1)
+  y = data[:, 1].T
+  model = LinearRegression().fit(x, y)
+  coef = model.coef_
+  angle = np.emath.arctanh(coef)
+  print(f'coef: {coef}; angle: {angle}')
+
+def getAngle(data, direction, show=False):
+  #print(data.shape, data[:3, :])
+
+  if int(direction) == 0 or int(direction) == 3:
+    cursor = int(data.shape[0] * 0.6)
+    data = data[:cursor, :]
+  else:
+    cursor = int(data.shape[0] * 0.4)
+    data = data[cursor:, :]
+
+  print(data.shape)
+
+  x = data[:, 0].reshape(-1, 1)
+  y = data[:, 1].T
+  model = LinearRegression().fit(x, y)
+  coef = model.coef_
+  angle = math.atan(coef)
+  print(f'coef: {coef}; angle: {angle}')
+
+  if show:
+    plt.scatter(x, y)
+    plt.show()
+  return angle
 
 #root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/total'
 #name = '8-1_9-58_8_0.pcd'
@@ -149,8 +187,3 @@ def backbone_xy(cattle, cattle_path, name):
 #calf.visual()
 #
 #getAngle(data)
-
-def casty(cattle):
-  points = cattle.getPoints() 
-  points[:, 1] = 0
-  cattle.visual()

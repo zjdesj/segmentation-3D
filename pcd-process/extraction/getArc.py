@@ -1,4 +1,4 @@
-# a component for standardization.
+# a component for normalisation.
 import sys
 sys.path.append('..')
 from basement import Farm

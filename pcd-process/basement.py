@@ -110,8 +110,8 @@ class Farm():
     ro.point_size = 1
     # set the background color of the open3d window to total black.
     #ro.background_color = np.asarray([0.6,0.6,0.6])
-    ro.background_color = np.asarray([1,1,1])
-    #ro.background_color = np.asarray([0,0,0])
+    #ro.background_color = np.asarray([1,1,1])
+    ro.background_color = np.asarray([0,0,0])
     # show coordination system
     ro.show_coordinate_frame = True
 
@@ -310,6 +310,19 @@ class Farm():
     data_path = self.dir
     self.dir = set_dir_path(data_path, name)
 
+  # for save ground backup.
+  def savePCDG(self, tag, pcd, targetDir=None):
+    name = f'{self.name}_{tag}'
+    if not targetDir:
+      targetDir = self.dir 
+
+    pcd_path = Path(targetDir, f'{name}.pcd')
+    pcd_path_str = str(pcd_path)
+
+    print(f"Filter: save a point cloud: {pcd_path_str}")
+
+    o3d.io.write_point_cloud(pcd_path_str, pcd)
+
   def savePCD(self, tag, pcd=None, targetDir=None):
     if not pcd:
       pcd = self.pcd 
@@ -392,7 +405,7 @@ class Farm():
     max_label = labels.max()
     print('...labels', len(labels))
     print(f'max_label: {max_label}')
-    print(labels/max_label)
+    #print(labels/max_label)
     colors = plt.get_cmap("tab20")(labels / (max_label if max_label > 0 else 1))
     colors[labels < 0] = 0  # labels = -1 的簇为噪声，以黑色显示
     self.pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])

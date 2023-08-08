@@ -1,4 +1,4 @@
-# a component for standardization.
+# a component for normalisation.
 import numpy as np
 
 def rotate(cattle, direction, arc):

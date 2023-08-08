@@ -1,6 +1,7 @@
-# a component for standardization.
+# a component for normalisation.
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 headings = '../../data-result/data-direction-flat.xlsx'
 df = pd.read_excel(headings, sheet_name='Sheet1', header=None)

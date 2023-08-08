@@ -27,6 +27,7 @@ def forOne(name, direction):
   cattle = getPCD(name)
   cattleE = getEPCD(name)
   target = Path(standing_path, 'rotation', direction)
+  #target = Path(standing_path, 'rotate')
 
   if direction == '1':
     cattle = rotateReverse(cattle)
@@ -55,7 +56,7 @@ def forOne(name, direction):
     cattle = rotateReverse(cattle)
     cattleE = rotateReverse(cattleE)
 
-  cattle.savePCD('ro', targetDir=target)
+  #cattle.savePCD('ro', targetDir=target)
   cattleE.savePCD('re', targetDir=target)
 
 if __name__ == '__main__':
