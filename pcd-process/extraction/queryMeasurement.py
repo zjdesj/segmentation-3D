@@ -40,6 +40,13 @@ def updateSize(stem, size):
   except:
     print('updateSize failed')
 
+def queryDBSCAN(stem):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  index = np.where(data[:, 3] == stem)[0][0]
+  item = data[index]
+
+  return item[4:7]
 
 if __name__ == '__main__':
   ground_height = -11.72945499

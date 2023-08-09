@@ -45,8 +45,11 @@ def top_points(cattle):
     slice = crop_x(cattle, cur)
     sp = cattle.getPoints(slice)
     
-    print(f'sp.leng: {len(sp)}')
+    #print(f'sp.leng: {len(sp)}')
     z = sp[:, 2] 
+
+    if not len(sp):
+      continue
     
     ind = np.where(z == np.max(z))
     max = sp[ind]
@@ -105,9 +108,9 @@ def backbone(cattle):
   [tops, a, b] = top_points(cattle)
   print(len(tops))
 
-  cc = np.tile([0,1,0], (tops.shape[0], 1))
+  cc = np.tile([1,0,0], (tops.shape[0], 1))
 
-  tops[:,1] = 0
+  #tops[:,1] = 0
 
   tpcd = o3d.geometry.PointCloud()
   #tp = np.concatenate((points, tops), axis=0)

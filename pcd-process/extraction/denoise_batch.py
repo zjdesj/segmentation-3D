@@ -32,19 +32,6 @@ def getPCD(name):
   calf.show_summary()
   return calf
 
-def showBackbone(name):
-  calf = getPCD(name)
-  calf.show_summary()
-  calf.visual()
-
-  tpcd = backbone(calf)
-  #data = backbone_xy(calf, name)
-
-  calf.updatePCD(tpcd)
-  calf.show_summary()
-  calf.visual()
-
-  #tpcd = backbone(calf, name)
 
 def filterGround_show(cattle):
   plane_model, inliers = cattle.pcd.segment_plane(distance_threshold=0.015, ransac_n=3, num_iterations=1000)
@@ -73,7 +60,7 @@ def filterGround(cattle):
   
   return cattle, ground_height 
 
-def filterNoise(cattle, eps=0.03, min_points=4, min_cluster=3000):
+def filterNoise(cattle, eps=0.05, min_points=4, min_cluster=2000):
   print(' start cluster, method: DBSCAN: ')
   pcd = cattle.pcd
   dbscan = {
@@ -103,16 +90,17 @@ def getCluster(cattle, labels, ground_height):
 
     summary = cattle.set_summary(cluster)
     # remove lying
-    if summary["max_bound"][2] - ground_height < 0.75:
+    if (ground_height != 0) and (summary["max_bound"][2] - ground_height < 0.75):
       continue
     # remove wall.
     if summary["region"][0] < 0.2:
       continue
 
     print('......', summary["points"])
-    updateSize(cattle.name.replace('_re', ''), summary["points"])
     cattle.updatePCD(cluster)
-    cattle.savePCD(f'pure_{i}', targetDir=cattle.dir)
+    if ground_height != 0:
+      updateSize(cattle.name.replace('_re', ''), summary["points"])
+      cattle.savePCD(f'pure_{i}', targetDir=cattle.dir)
 
   return cattle
 
@@ -120,15 +108,27 @@ def denoise(name):
   calf = getPCD(name)
   cpcd = calf.crop_z(0)
   calf.updatePCD(cpcd)
-  #[calf, ground_height] = filterGround(calf)
+  [calf, ground_height] = filterGround(calf)
 
-  cpcd = calf.crop_z(0.5)
-  calf.updatePCD(cpcd)
-  ground_height = -7.96043062210083
+  #cpcd = calf.crop_z(0.5)
+  #calf.updatePCD(cpcd)
 
   labels = filterNoise(calf)
   pure_cattle = getCluster(calf, labels, ground_height)
   return pure_cattle
+
+# for bb use
+def reDenoise(calf, ret):
+  #cpcd = calf.crop_z(0.2)
+  #calf.updatePCD(cpcd)
+
+  [esp, m, ps] = ret
+
+  labels = filterNoise(calf, esp, m, ps)
+
+  pure_cattle = getCluster(calf, labels, 0)
+  return pure_cattle
+
 
 def batch_denoise(patten):
   root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/rotate'
@@ -140,11 +140,11 @@ def batch_denoise(patten):
 
 
 if __name__ == '__main__':
-  conf = {
-    #'a': [0.04, 2, 2000],
-    #'0_0': [0.04, 2, 1000 ],
-    '4_0': [0.03, 4, 3000, 0.5]
-  }
+  #conf = {
+  #  #'a': [0.04, 2, 2000],
+  #  #'0_0': [0.04, 2, 1000 ],
+  #  '4_0': [0.03, 4, 3000, 0.5]
+  #}
   #batch_denoise('30-2_*_re.pcd')
-  name = '8-3_9-60_4_0_re.pcd'
+  name = '8-5_9-61_6_re.pcd'
   pure_cattle = denoise(name)  
