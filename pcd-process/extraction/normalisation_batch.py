@@ -26,8 +26,10 @@ def forAll():
 def forOne(name, direction):
   cattle = getPCD(name)
   cattleE = getEPCD(name)
-  target = Path(standing_path, 'rotation', direction)
-  #target = Path(standing_path, 'rotate')
+  #target = Path(standing_path, 'rotation', direction)
+  target = Path(standing_path, 'rotate')
+
+  cattle.show_summary()
 
   if direction == '1':
     cattle = rotateReverse(cattle)
@@ -61,5 +63,5 @@ def forOne(name, direction):
 
 if __name__ == '__main__':
   #forCategory('1')
-  #for12(name, '1')
+  ##for12(name, '1')
   forAll()

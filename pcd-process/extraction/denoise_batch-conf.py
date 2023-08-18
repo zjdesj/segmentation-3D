@@ -1,4 +1,38 @@
   #conf = {
+  #  'a': [0.03, 1, 3000],
+  #}
+  #batch_denoise('n15-3_*_re.pcd')
+
+  #conf = {
+  #  'a': [0.04, 2, 3000],
+  #  '7.0': [0.03, 1, 3000],
+  #}
+  #batch_denoise('n15-5_*_re.pcd')
+  #name = 'n15-5_31-82_7_0_re.pcd'
+  #pure_cattle = denoise(name)  
+
+  #conf = {
+  #  'a': [0.04, 2, 3000],
+  #}
+  #batch_denoise('n10-5_*_re.pcd')
+
+  #conf = {
+  #  'a': [0.03, 1, 3000],
+  #}
+  #batch_denoise('n10-3_*_re.pcd')
+
+  #conf = {
+  #  'a': [0.04, 1, 3000],
+  #}
+  #batch_denoise('n8-5_*_re.pcd')
+ 
+  #conf = {
+  #  'a': [0.03, 2, 4000],
+  #}
+  #batch_denoise('n8-3_*_re.pcd')
+  
+  
+  #conf = {
   #  'a': [0.05, 3, 1500, 0.2],
   #  '11': [0.05, 3, 1500, 0.4], # 查看地面 scale
   #  '9_0': [0.05, 3, 1500, 0.4], # 查看地面

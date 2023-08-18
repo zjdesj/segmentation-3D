@@ -48,19 +48,23 @@ def filterGround(cattle):
   cattle.savePCDG('noGround', pcd=cpcd, targetDir=cattle.dir)
   #cattle.savePCDG('ground', pcd=ground, targetDir=cattle.dir)
 
+
   cattle.show_summary()
 
   cattle.updatePCD(cpcd)
 
   cattle.show_summary()
 
-  ground_height = cattle.summary["min_bound"][2]
+  groundCenter = ground.get_center()
+  ground_height = groundCenter[2]
+  print('ground_center', ground_height, ground.get_max_bound()[2] - ground_height)
+  #ground_height = cattle.summary["min_bound"][2]
 
   updateGround(cattle.name.replace('_re', ''), ground_height)
   
   return cattle, ground_height 
 
-def filterNoise(cattle, eps=0.05, min_points=4, min_cluster=2000):
+def filterNoise(cattle, eps=0.03, min_points=1, min_cluster=3000):
   print(' start cluster, method: DBSCAN: ')
   pcd = cattle.pcd
   dbscan = {
@@ -113,6 +117,7 @@ def denoise(name):
   #cpcd = calf.crop_z(0.5)
   #calf.updatePCD(cpcd)
 
+  #ground_height =  -9.988052368164062
   labels = filterNoise(calf)
   pure_cattle = getCluster(calf, labels, ground_height)
   return pure_cattle
@@ -140,11 +145,10 @@ def batch_denoise(patten):
 
 
 if __name__ == '__main__':
-  #conf = {
-  #  #'a': [0.04, 2, 2000],
-  #  #'0_0': [0.04, 2, 1000 ],
-  #  '4_0': [0.03, 4, 3000, 0.5]
-  #}
-  #batch_denoise('30-2_*_re.pcd')
-  name = '8-5_9-61_6_re.pcd'
-  pure_cattle = denoise(name)  
+  conf = {
+    'a': [0.03, 1, 3000],
+  }
+  batch_denoise('n15-3_*_re.pcd')
+
+  #name = 'n15-5_31-82_7_0_re.pcd'
+  #pure_cattle = denoise(name)  

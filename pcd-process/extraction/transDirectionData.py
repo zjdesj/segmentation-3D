@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-headings = '../../data-result/data-direction.xlsx'
-df = pd.read_excel(headings, sheet_name='data-derection', header=None)
+headings = '../../data-result/data-direction-night.xlsx'
+df = pd.read_excel(headings, sheet_name='data-direction', header=None)
 
 def trans():
   data = df.values
@@ -23,6 +23,6 @@ def trans():
 
   spath = Path(headings).parent
   print(spath)
-  df2.to_excel(Path(spath, 'data-direction-flat.xlsx'), index=False)
+  df2.to_excel(Path(spath, 'data-direction-night-flat.xlsx'), index=False)
     
 trans()
