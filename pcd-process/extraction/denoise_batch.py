@@ -45,8 +45,9 @@ def filterGround(cattle):
   cpcd = cattle.pcd.select_by_index(inliers, invert=True)
 
   # 保存两个pcd做图
-  cattle.savePCDG('noGround', pcd=cpcd, targetDir=cattle.dir)
   #cattle.savePCDG('ground', pcd=ground, targetDir=cattle.dir)
+
+  ##cattle.savePCDG('noGround', pcd=cpcd, targetDir=cattle.dir)
 
 
   cattle.show_summary()
@@ -113,6 +114,8 @@ def denoise(name):
   cpcd = calf.crop_z(0)
   calf.updatePCD(cpcd)
   [calf, ground_height] = filterGround(calf)
+  ## 过滤
+  return
 
   #cpcd = calf.crop_z(0.5)
   #calf.updatePCD(cpcd)
@@ -143,12 +146,48 @@ def batch_denoise(patten):
     print(calf)
     pure_cattle = denoise(calf) 
 
+def update_ground(patten):
+  root_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/rotate'
+  cattle_dir = Path(root_path)
+  file = cattle_dir.glob(patten)
+  for calf in file:
+    print(calf)
+    pure_cattle = denoise(calf) 
 
 if __name__ == '__main__':
-  conf = {
-    'a': [0.03, 1, 3000],
-  }
-  batch_denoise('n15-3_*_re.pcd')
+  #batch_denoise('8-1_*_re.pcd')
+  #batch_denoise('8-2_*_re.pcd')
+  #batch_denoise('8-3_*_re.pcd')
+  #batch_denoise('8-5_*_re.pcd')
+  #batch_denoise('8-7_*_re.pcd')
+  #batch_denoise('8-9_*_re.pcd')
 
+  batch_denoise('10-1_*_re.pcd')
+  batch_denoise('10-2_*_re.pcd')
+  batch_denoise('10-3_*_re.pcd')
+  batch_denoise('10-5_*_re.pcd')
+  batch_denoise('10-7_*_re.pcd')
+  batch_denoise('10-9_*_re.pcd')
+
+  batch_denoise('15-1_*_re.pcd')
+  batch_denoise('15-2_*_re.pcd')
+  batch_denoise('15-3_*_re.pcd')
+  batch_denoise('15-5_*_re.pcd')
+  batch_denoise('15-7_*_re.pcd')
+  batch_denoise('15-9_*_re.pcd')
+
+  batch_denoise('30-1_*_re.pcd')
+  batch_denoise('30-2_*_re.pcd')
+  batch_denoise('30-3_*_re.pcd')
+  batch_denoise('30-5_*_re.pcd')
+  batch_denoise('30-7_*_re.pcd')
+  batch_denoise('30-9_*_re.pcd')
+
+  batch_denoise('50-1_*_re.pcd')
+  batch_denoise('50-2_*_re.pcd')
+  batch_denoise('50-3_*_re.pcd')
+  batch_denoise('50-5_*_re.pcd')
+  batch_denoise('50-7_*_re.pcd')
+  batch_denoise('50-9_*_re.pcd')
   #name = 'n15-5_31-82_7_0_re.pcd'
   #pure_cattle = denoise(name)  
