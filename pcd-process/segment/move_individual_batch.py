@@ -1,7 +1,8 @@
 from moveClusters_individuals import move_individual
 import csv
 
-data = csv.reader(open('../../data-result/data.csv', encoding="utf8"))
+data = csv.reader(open('../../data-result/data-night.csv', encoding="utf8"))
+#data = csv.reader(open('../../data-result/data.csv', encoding="utf8"))
 
 for line in data:
   [plan, flight, str] = line

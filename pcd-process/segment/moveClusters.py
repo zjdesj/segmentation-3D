@@ -7,8 +7,10 @@ def getZip(root):
   # zip 文件夹
   root = Path(root)
   source = Path(root, 'ret_pcd')
+  #source = Path(root, 'ret_pcd').glob('31-*')
   target = Path(root, 'cattle')
 
+  #for plan in  tqdm(source, desc='Moving cattle'):
   for plan in  tqdm(source.iterdir(), desc='Moving cattle'):
     print(f'\n plan: {plan}')
     if not plan.is_dir():

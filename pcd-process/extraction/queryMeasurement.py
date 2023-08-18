@@ -40,6 +40,18 @@ def updateSize(stem, size):
   except:
     print('updateSize failed')
 
+def updateWidth(stem, width):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    data[index][9] = width
+    df2 = pd.DataFrame(data, columns=df.columns)
+    df2.to_excel(measurement, index=False)
+  except:
+    print('updateWidth failed')
+
+
 def queryDBSCAN(stem):
   df = pd.read_excel(measurement , sheet_name='Sheet1')
   data = df.values
@@ -47,6 +59,15 @@ def queryDBSCAN(stem):
   item = data[index]
 
   return item[4:7]
+
+def queryGround(stem):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  index = np.where(data[:, 3] == stem)[0][0]
+  item = data[index]
+
+  return item[8]
+
 
 if __name__ == '__main__':
   ground_height = -11.72945499

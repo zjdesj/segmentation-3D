@@ -10,7 +10,7 @@ def getZip(root, dir):
   dir_all = Path(dir, 'ret_all')
   dir_laz = Path(dir, 'ret_laz')
   dir_pcd = Path(dir, 'ret_pcd')
-  zips = root.rglob('*.zip')
+  zips = Path(root, 'ret/31_76-86-ret').glob('*.zip')
   print(dir_laz, dir_pcd)
 
   if not dir_all.is_dir():
@@ -20,7 +20,7 @@ def getZip(root, dir):
   if not dir_pcd.is_dir():
     dir_pcd.mkdir()    
 
-  for file in tqdm(zips, total=len(zips), desc='Unziping'):
+  for file in tqdm(zips, desc='Unziping'):
       name = file.stem
       dir_path = Path(dir_all, name)
       ZipFile(file).extractall(dir_path)

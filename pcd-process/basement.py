@@ -264,7 +264,22 @@ class Farm():
     max = min_bound[2] + 1.35
 
     return self.removeRoofAndGround(max_threshold=max, min_threshold=min)
-    
+  
+  def crop_z2(self, min, max=None):
+    min_bound = self.summary["min_bound"]
+    max_bound = self.summary["max_bound"]
+
+    min_bound[2] = min
+    if max:
+      max_bound[2] = max 
+    else:
+      max_bound[2] = max_bound[2] 
+      
+    box = o3d.geometry.AxisAlignedBoundingBox(min_bound, max_bound)
+
+    cpcd = self.pcd.crop(box)
+    return cpcd
+
   def cropFarm_y_2(self, shift_y):
     min_bound = self.summary["min_bound"]
     max_bound = self.summary["max_bound"]

@@ -38,8 +38,9 @@ def entity(cattle_path, farm_path, stem):
 def getEntities(root_path):
   farm_path = Path(root_path, 'ret_pcd')
   cattle_path = Path(root_path, 'cattle')
+  dirs = cattle_path.glob('31-*')
 
-  for plan in tqdm(cattle_path.iterdir(), desc='get cattle entities of standard standing'):
+  for plan in tqdm(dirs, desc='get cattle entities of standard standing'):
   #for plan in tqdm(['9-53', '9-54'], desc='get cattle entities of standard standing'):
     if not plan.is_dir():
       continue
@@ -64,4 +65,11 @@ if __name__ == '__main__':
   root = '/Volumes/2T-Experiment/许昌牛场PCD/'
   #getEntities(root)
 
-  getUncertain(root, '9-62')
+  #getUncertain(root, '31-77')
+  #getUncertain(root, '31-79')
+  #getUncertain(root, '31-80')
+  #getUncertain(root, '31-82')
+  getUncertain(root, '31-83')
+  getUncertain(root, '31-84')
+  getUncertain(root, '31-85')
+  getUncertain(root, '31-86')

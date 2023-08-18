@@ -175,7 +175,10 @@ def processBackbone(name):
 
   calf.savePCDG('bbInCalf', bbInCalf.pcd, feature_path)
 
-  bbInCatttle = backboneInCalf(bb_ind, getPCD(name))
+
+  ocalf = getPCD(name)
+  bb_ind = getBackBoneInd(bb, ocalf)
+  bbInCatttle = backboneInCalf(bb_ind, ocalf)
   calf.savePCDG('bbInCattle', bbInCatttle.pcd, feature_path)
 
 def batch_processBackbone(patten):
@@ -190,8 +193,40 @@ def batch_processBackbone(patten):
 if __name__ == '__main__':
   feature_path = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/r-feature'
 
+  batch_processBackbone('50-1_*_re_pure_*.pcd')
+  batch_processBackbone('50-2_*_re_pure_*.pcd')
+  batch_processBackbone('50-3_*_re_pure_*.pcd')
+  batch_processBackbone('50-5_*_re_pure_*.pcd')
   batch_processBackbone('50-7_*_re_pure_*.pcd')
   batch_processBackbone('50-9_*_re_pure_*.pcd')
+
+  batch_processBackbone('30-1_*_re_pure_*.pcd')
+  batch_processBackbone('30-2_*_re_pure_*.pcd')
+  batch_processBackbone('30-3_*_re_pure_*.pcd')
+  batch_processBackbone('30-5_*_re_pure_*.pcd')
+  batch_processBackbone('30-7_*_re_pure_*.pcd')
+  batch_processBackbone('30-9_*_re_pure_*.pcd')
+
+  batch_processBackbone('15-1_*_re_pure_*.pcd')
+  batch_processBackbone('15-2_*_re_pure_*.pcd')
+  batch_processBackbone('15-3_*_re_pure_*.pcd')
+  batch_processBackbone('15-5_*_re_pure_*.pcd')
+  batch_processBackbone('15-7_*_re_pure_*.pcd')
+  batch_processBackbone('15-9_*_re_pure_*.pcd')
+
+  batch_processBackbone('10-1_*_re_pure_*.pcd')
+  batch_processBackbone('10-2_*_re_pure_*.pcd')
+  batch_processBackbone('10-3_*_re_pure_*.pcd')
+  batch_processBackbone('10-5_*_re_pure_*.pcd')
+  batch_processBackbone('10-7_*_re_pure_*.pcd')
+  batch_processBackbone('10-9_*_re_pure_*.pcd')
+
+  batch_processBackbone('8-1_*_re_pure_*.pcd')
+  batch_processBackbone('8-2_*_re_pure_*.pcd')
+  batch_processBackbone('8-3_*_re_pure_*.pcd')
+  batch_processBackbone('8-5_*_re_pure_*.pcd')
+  batch_processBackbone('8-7_*_re_pure_*.pcd')
+  batch_processBackbone('8-9_*_re_pure_*.pcd')
   #name = '8-5_9-61_6_re_pure_0.pcd'
   #processBackbone(name)
 

@@ -7,7 +7,7 @@ from matplotlib.colors import LogNorm, SymLogNorm
 import datetime
 
 resultFile = '../../data-result/flight-result-segment.xlsx'
-df = pd.read_excel(resultFile, sheet_name='data-points', dtype={'time': datetime.timedelta})
+df = pd.read_excel(resultFile, sheet_name='flights-points', dtype={'time': datetime.timedelta})
 
 def plotStanding():
   data = df.values[:, :]
