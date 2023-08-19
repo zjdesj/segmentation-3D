@@ -5,7 +5,7 @@ from basement import Farm
 from pathlib import Path
 from backbone import backbone, top_points
 import numpy as np
-from queryMeasurement import queryGround, updateWidth
+from queryMeasurement import queryGround, updateWidth, updateWidthNoPure
 #from denoise_batch import reDenoise
 from backbone_batch import filter
 
@@ -27,7 +27,7 @@ def castXY(calf):
 
   return calf
 
-def getBelly(name):
+def getBelly(name, pure=True):
   calf = getPCD(name)
 
   stem = re.sub(r'_re_pure.*', '', name)
@@ -41,38 +41,51 @@ def getBelly(name):
   calf.savePCDG('above', roAbove)
 
   calf.updatePCD(roAbove)
-  roPAbove = filter(calf)
-  calf.savePCDG('abovePure', roPAbove.pcd)
 
-  minx = roPAbove.summary['min_bound'][0]
-  roPAboveCutPCD = roPAbove.crop_x(minx + 0.1, minx + 0.9)
-  calf.savePCDG('abovePureCropX', roPAboveCutPCD)
-  roPAbove.updatePCD(roPAboveCutPCD)
-
-  return roPAbove
+  if pure:
+    roPAbove = filter(calf)
+    calf.savePCDG('abovePure', roPAbove.pcd)
+    minx = roPAbove.summary['min_bound'][0]
+    roPAboveCutPCD = roPAbove.crop_x(minx + 0.1, minx + 0.9)
+    calf.savePCDG('abovePureCropX', roPAboveCutPCD)
+    roPAbove.updatePCD(roPAboveCutPCD)
+    return roPAbove
+  else:
+    minx = calf.summary['min_bound'][0]
+    roAboveCutPCD = calf.crop_x(minx + 0.1, minx + 0.9)
+    calf.savePCDG('aboveCropX', roAboveCutPCD)
+    calf.updatePCD(roAboveCutPCD)
+    return calf
 
   #crap = castXY(roPAbove)
   #calf.savePCDG('abovePure-C', crap.pcd) 
 
-def setWidth(calf):
+def setWidth(calf, noPure=False):
   #calf.visual()  
   width = calf.summary['region'][1]
   print(f'width: {width}')
 
   stem = re.sub(r'_re_pure.*', '', calf.name)
 
-  updateWidth(stem, width)
+  if noPure:
+    updateWidthNoPure(stem, width)
+  else:
+    updateWidth(stem, width)
 
-def batchBelly():
+def batchBelly(patten):
   bellyPath = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/r-feature'
   #bellyPath = '/Users/wyw/Documents/Chaper2/github-code/data/cattle-individual/belly'
   cattle_dir = Path(bellyPath)
-  patten = '*bbInCattle.pcd'
   files = cattle_dir.glob(patten)
 
   for calfFile in files:
     name = Path(calfFile).name
     print('calf file name:', calfFile, name)
+    # 设置不去噪宽度
+    #calf = getBelly(name, pure=False)
+    #setWidth(calf, noPure=True)
+
+    # 设置去噪后宽度
     calf = getBelly(name)
     setWidth(calf)
 
@@ -97,6 +110,12 @@ if __name__ == '__main__':
   #setWidth(calf)
 
 
-  #batchBelly()
+  patten = '8-9*bbInCattle.pcd'
+  #batchBelly('8-*bbInCattle.pcd')
+  #batchBelly('10-*bbInCattle.pcd')
+  #batchBelly('15-*bbInCattle.pcd')
+  #batchBelly('30-*bbInCattle.pcd')
+  #batchBelly('50-*bbInCattle.pcd')
+  batchBelly('n*bbInCattle.pcd')
 
   

@@ -51,6 +51,16 @@ def updateWidth(stem, width):
   except:
     print('updateWidth failed')
 
+def updateWidthNoPure(stem, width):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    data[index][10] = width
+    df2 = pd.DataFrame(data, columns=df.columns)
+    df2.to_excel(measurement, index=False)
+  except:
+    print('updateWidth failed')
 
 def queryDBSCAN(stem):
   df = pd.read_excel(measurement , sheet_name='Sheet1')

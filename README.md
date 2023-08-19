@@ -16,3 +16,5 @@ for chapter 2
 - 2 使用transDirectionData.py将data-direction.xlsx打平到data-direction-flat.xlsx
 - 3 使用normalisation_batch.py将点云旋转
 - 4 使用denoise_batch.py 过滤
+- 5 使用backbone_batch.py获取相关的脊柱点云
+- 6 使用belly.py更新宽度
