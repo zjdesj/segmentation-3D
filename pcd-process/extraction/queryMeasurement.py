@@ -56,11 +56,23 @@ def updateWidthNoPure(stem, width):
   data = df.values
   try:
     index = np.where(data[:, 3] == stem)[0][0]
-    data[index][10] = width
+    data[index][11] = width
     df2 = pd.DataFrame(data, columns=df.columns)
     df2.to_excel(measurement, index=False)
   except:
     print('updateWidth failed')
+
+def updateHH(stem, HH):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    data[index][12] = HH
+    df2 = pd.DataFrame(data, columns=df.columns)
+    df2.to_excel(measurement, index=False)
+  except:
+    print('updateHipheight failed')
+
 
 def queryDBSCAN(stem):
   df = pd.read_excel(measurement , sheet_name='Sheet1')
