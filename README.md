@@ -18,3 +18,5 @@ for chapter 2
 - 4 使用denoise_batch.py 过滤
 - 5 使用backbone_batch.py获取相关的脊柱点云
 - 6 使用belly.py更新宽度
+- 7 从bbInCattle 文件中截取hip点云
+- 8 使用hipHeight.py 更新hipheight数据。

@@ -67,12 +67,36 @@ def updateHH(stem, HH):
   data = df.values
   try:
     index = np.where(data[:, 3] == stem)[0][0]
-    data[index][12] = HH
+    data[index][13] = HH
+    data[index][14] = HH - data[index][8]
     df2 = pd.DataFrame(data, columns=df.columns)
     df2.to_excel(measurement, index=False)
   except:
     print('updateHipheight failed')
 
+def updateColumn(stem, value, name):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  colInd = np.where(df.columns == name)[0][0]
+
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    data[index][colInd] = value
+    df2 = pd.DataFrame(data, columns=df.columns)
+    df2.to_excel(measurement, index=False)
+  except:
+    print('updateColumn failed')
+def queryColumn(stem, key):
+  print(f'stem: {stem}, key: {key}')
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  colInd = np.where(df.columns == key)[0][0]
+
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    return data[index][colInd]
+  except:
+    print('QueryColumn failed')
 
 def queryDBSCAN(stem):
   df = pd.read_excel(measurement , sheet_name='Sheet1')
@@ -93,4 +117,5 @@ def queryGround(stem):
 
 if __name__ == '__main__':
   ground_height = -11.72945499
-  updateGround('8-1_9-58_7_re'.replace('_re', ''), ground_height)
+  #updateGround('8-1_9-58_7_re'.replace('_re', ''), ground_height)
+  updateColumn('8-1_9-58_7', ground_height, 'joint Hip H')
