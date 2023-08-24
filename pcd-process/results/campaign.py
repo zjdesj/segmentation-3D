@@ -6,22 +6,26 @@ import matplotlib.dates as mdates
 from matplotlib.colors import LogNorm, SymLogNorm
 import datetime
 
-resultFile = '../../data-result/flight-result-segment.xlsx'
+resultFile = '../../data-result/results-campaigns.xlsx'
 df = pd.read_excel(resultFile, sheet_name='flights-points', dtype={'time': datetime.timedelta})
 
 def plotStanding():
-  data = df.values[:, :]
+  # 设置两种绘图颜色
+  c1='b'
+  c2='r'
+  c3='y'
+  data = df.values
 
   sortedData = data[data[:, 2].argsort()]
-  sortedData[:, 3:] = sortedData[:, 3:].astype(int)
+  sortedData[:, 3:-2] = sortedData[:, 3:-2].astype(int)
 
   d8 = np.array([cam for cam in sortedData if cam[0].startswith('8')])
   d9 = np.array([cam for cam in sortedData if cam[0].startswith('9')])
+  d31 = np.array([cam for cam in sortedData if cam[0].startswith('31')])
   
   time1 = d8.T[2]
   total1 = d8.T[3]
   a1 = d8.T[4]
-
   time1 = [datetime.datetime.combine(datetime.date.today(), t) for t in time1]
 
   time2 = d9.T[2]
@@ -29,24 +33,32 @@ def plotStanding():
   a2 = d9.T[4]
   time2 = [datetime.datetime.combine(datetime.date.today(), t) for t in time2]
 
+  time3 = d31.T[2]
+  total3 = d31.T[3]
+  a3 = d31.T[4]
+  time3 = [datetime.datetime.combine(datetime.date.today(), t) for t in time3]
+
   #创建子图
-  fig, ax = plt.subplots(1, 1, figsize=(10, 5)) 
+  fig = plt.figure(figsize=(10, 4))
+
+  ax = fig.add_subplot(111, label='1') 
   ax.grid(False) 
 
   #ax.xaxis.set_major_locator(mdates.AutoDateLocator())
   ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-  ax.plot(time1, total1, 'd-', color = 'b', label='afternoon campaigns on 9th Jan.')
-  ax.plot(time1, a1, 'd-', color = 'g', label='individuals from afternoon campaigns on 9th Jan.')
-  ax.plot(time2[0:13], total2[0:13], 's-', color = 'b', label='morning campaigns on 9th Jan.')
-  ax.plot(time2[0:13], a2[0:13], 's-', color = 'g', label='individuals from morning campaigns on 9th Jan.')
-  ax.plot(time2[13:], total2[13:], 'o-', color = 'b', label='afternoon campaigns on 9th Jan.')
-  ax.plot(time2[13:], a2[13:], 'o-', color = 'g', label='individuals from afternoon campaigns on 9th Jan.')
+  ax.plot(time1, total1, 'd-', color = c1, label='afternoon campaigns on 8th Jan.')
+  ax.plot(time1, a1, 'd-', color = c3, label='selected from afternoon campaigns on 8th Jan.')
+  ax.plot(time2[0:12], total2[0:12], 's-', color = c1, label='morning campaigns on 9th Jan.')
+  ax.plot(time2[0:12], a2[0:12], 's-', color = c3, label='selected from morning campaigns on 9th Jan.')
+  ax.plot(time2[12:], total2[12:], 'o-', color = c1, label='afternoon campaigns on 9th Jan.')
+  ax.plot(time2[12:], a2[12:], 'o-', color = c3, label='selected from afternoon campaigns on 9th Jan.')
+  ax.plot(time3, total3, 'v-', color = c1, label='night campaigns on 31st Dec.')
+  ax.plot(time3, a3, 'v-', color = c3, label='selected from night campaigns on 31st Dec.')
 
-  plt.xlabel('time of conducting campaigns')
-  plt.ylabel('count of standing cattle')
-  plt.legend(loc='best')
+  ax.set_xlabel('time of conducting campaigns')
+  ax.set_ylabel('count of standing cattle')
+  ax.legend(loc='upper right')
 
-  fig.autofmt_xdate()
 
   plt.tight_layout()
   plt.show()
@@ -142,21 +154,26 @@ def plotDouble():
   data = df.values
 
   sortedData = data[data[:, 2].argsort()]
-  sortedData[:, 3:] = sortedData[:, 3:].astype(int)
+  sortedData[:, 3:-2] = sortedData[:, 3:-2].astype(int)
 
   d8 = np.array([cam for cam in sortedData if cam[0].startswith('8')])
   d9 = np.array([cam for cam in sortedData if cam[0].startswith('9')])
+  d31 = np.array([cam for cam in sortedData if cam[0].startswith('31')])
   
   time1 = d8.T[2]
   total1 = d8.T[3]
   a1 = d8.T[4]
-
   time1 = [datetime.datetime.combine(datetime.date.today(), t) for t in time1]
 
   time2 = d9.T[2]
   total2 = d9.T[3]
   a2 = d9.T[4]
   time2 = [datetime.datetime.combine(datetime.date.today(), t) for t in time2]
+
+  time3 = d31.T[2]
+  total3 = d31.T[3]
+  a3 = d31.T[4]
+  time3 = [datetime.datetime.combine(datetime.date.today(), t) for t in time3]
 
   #创建子图
   fig = plt.figure(figsize=(10, 5))
@@ -168,11 +185,13 @@ def plotDouble():
   #ax.xaxis.set_major_locator(mdates.AutoDateLocator())
   ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
   ax.plot(time1, total1, 'd-', color = c1, label='afternoon campaigns on 8th Jan.')
-  #ax.plot(time1, a1, 'd-', color = c3, label='individuals from afternoon campaigns on 9th Jan.')
+  ax.plot(time1, a1, 'd-', color = c3, label='individuals from afternoon campaigns on 9th Jan.')
   ax.plot(time2[0:12], total2[0:12], 's-', color = c1, label='morning campaigns on 9th Jan.')
-  #ax.plot(time2[0:12], a2[0:12], 's-', color = c3, label='individuals from morning campaigns on 9th Jan.')
+  ax.plot(time2[0:12], a2[0:12], 's-', color = c3, label='individuals from morning campaigns on 9th Jan.')
   ax.plot(time2[12:], total2[12:], 'o-', color = c1, label='afternoon campaigns on 9th Jan.')
-  #ax.plot(time2[12:], a2[12:], 'o-', color = c3, label='individuals from afternoon campaigns on 9th Jan.')
+  ax.plot(time2[12:], a2[12:], 'o-', color = c3, label='individuals from afternoon campaigns on 9th Jan.')
+  ax.plot(time3, total3, 'v-', color = 'b', label='night campaigns on 31st Dec.')
+  ax.plot(time3, a3, 'v-', color = 'g', label='individuals from night campaigns on 31st Dec.')
 
   ax.set_xlabel('time of conducting campaigns', color=c1)
   ax.set_ylabel('count of standing cattle', color=c1)
@@ -191,7 +210,7 @@ def plotDouble():
     return f'{x*1e-6:1.1f}M'
   ax2.yaxis.set_major_formatter(millions)
 
-  data2 = df.values[:, [1, 5]].T
+  data2 = df.values[:30, [1, 5]].T
   points = np.reshape(data2[1], (5, 6))
   s = [1,2,3,5,7,9]
   ax2.boxplot(points, labels=s, patch_artist=True)
@@ -220,7 +239,7 @@ def plotDouble():
 
 #plotRatio()
 #plotRatioPlot()
-#plotStanding()
+plotStanding()
 #plotPoints()
-plotDouble()
+#plotDouble()
 

@@ -67,8 +67,8 @@ def updateHH(stem, HH):
   data = df.values
   try:
     index = np.where(data[:, 3] == stem)[0][0]
-    data[index][13] = HH
-    data[index][14] = HH - data[index][8]
+    data[index][13] = HH #hip H
+    data[index][14] = HH - data[index][8] #HH
     df2 = pd.DataFrame(data, columns=df.columns)
     df2.to_excel(measurement, index=False)
   except:
@@ -87,7 +87,6 @@ def updateColumn(stem, value, name):
   except:
     print('updateColumn failed')
 def queryColumn(stem, key):
-  print(f'stem: {stem}, key: {key}')
   df = pd.read_excel(measurement , sheet_name='Sheet1')
   data = df.values
   colInd = np.where(df.columns == key)[0][0]
@@ -97,6 +96,22 @@ def queryColumn(stem, key):
     return data[index][colInd]
   except:
     print('QueryColumn failed')
+
+def queryZ(stem):
+  df = pd.read_excel(measurement , sheet_name='Sheet1')
+  data = df.values
+  keys = ['waist height', 'hip H', 'JHH', 'withers height', 'withers height2']  #LA, LH1, LH2, LB1, LB2, LD
+
+  colInd = [np.where(df.columns == key)[0][0] for key in keys]
+  print('colInd ',  colInd)
+
+  try:
+    index = np.where(data[:, 3] == stem)[0][0]
+    print(f'testtla', data[index])
+    return data[index][colInd]
+  except:
+    print('QueryColumn failed')
+
 
 def queryDBSCAN(stem):
   df = pd.read_excel(measurement , sheet_name='Sheet1')
@@ -118,4 +133,6 @@ def queryGround(stem):
 if __name__ == '__main__':
   ground_height = -11.72945499
   #updateGround('8-1_9-58_7_re'.replace('_re', ''), ground_height)
-  updateColumn('8-1_9-58_7', ground_height, 'joint Hip H')
+  #updateColumn('8-1_9-58_7', ground_height, 'joint Hip H')
+  ss = queryZ('8-1_9-58_7')
+  print(ss)

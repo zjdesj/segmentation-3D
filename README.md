@@ -20,3 +20,31 @@ for chapter 2
 - 6 使用belly.py更新宽度
 - 7 从bbInCattle 文件中截取hip点云
 - 8 使用hipHeight.py 更新hipheight数据。
+
+## data-measurment.xlsx 属性说明
+-  hip H #使用bounding box框高 
+-  HH # bounding box框高 - ground height
+-
+-  joint hip H #使用color[0] = 1来区分坐标值的 第一高点
+-  joint HH # joint hip H - ground height
+-
+-  JHH #使用color[0] = 1, color[1] = 0来区分坐标值的 第一高点
+-  JHHG # JHH - ground height
+-  Bsize # backbone 点个数
+
+-  joint #截面与backbone相交的右边第一点坐标
+
+-  waist height # 从截面往左0.4m 找寻到最高z值作为waist height
+-  waist H # waist height - ground height
+-  waistgap # 截面左侧 > 0.5 m
+
+-  withers height # 截面右侧 0.6 -0.8m 找寻到最高z值作为withers height
+-  withers H  # withers height - ground height
+-  withersgap	 # 最高点x距离截面x + 0.6 距离
+
+-  withers height2 # 截面右侧 0.55 -0.8m 找寻到最高z值作为withers height
+-  withers H2	# withers height - ground height
+-  withersgap2 # 最高点x距离截面x + 0.6 距离
+
+-  back height # 从截面到截面+ 0.5 中找寻最低z值作为back height
+-  back H # back height - ground height
