@@ -27,7 +27,6 @@ def modifyRow(row, columns):
   landmarkXArr = vectorized_function(landmarkStrArr)
 
   LT2, LT1, LA, LH, LD, LB, LM1, LM2  =  landmarkXArr
-  print('LH', LH, 'LA:', LA)
 
   AH = LH - LA
   BH = LB - LH
@@ -55,7 +54,7 @@ def batch():
   df = pd.read_excel(xyzFile , sheet_name='Sheet1')
   data = df.values
 
-  for ind, row  in enumerate(data[:2, :]):
+  for ind, row  in enumerate(data):
     row = modifyRow(row, df.columns)
   
   updateData(data, df.columns)
