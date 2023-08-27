@@ -107,7 +107,6 @@ def queryZ(stem):
 
   try:
     index = np.where(data[:, 3] == stem)[0][0]
-    print(f'testtla', data[index])
     return data[index][colInd]
   except:
     print('QueryColumn failed')
